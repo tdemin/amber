@@ -4,6 +4,9 @@
 # VSCode settings
 .vscode
 
+# App settings
+config.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
