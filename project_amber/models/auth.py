@@ -1,6 +1,10 @@
 from project_amber.app import db
 
 class User(db.Model):
+    """
+    Holds the usual user details (username, password). The password is
+    hashed with bcrypt and a random salt.
+    """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), unique=True, nullable=False)
     password = db.Column(db.String(256))
@@ -13,7 +17,7 @@ class Session(db.Model):
     """
     token = db.Column(db.String(256), primary_key=True)
     user = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    loginTime = db.Column(db.Integer, nullable=False)
+    login_time = db.Column(db.Integer, nullable=False)
     def __repr__(self):
-        return "<Session token='%s' user='%d' loginTime='%d'>" % \
-            self.token, self.user, self.loginTime
+        return "<Session token='%s' user='%d' login_time='%d'>" % \
+            self.token, self.user, self.login_time
