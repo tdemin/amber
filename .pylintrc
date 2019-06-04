@@ -87,7 +87,7 @@ property-classes=abc.abstractproperty
 [TYPECHECK]
 ignore-mixin-members=yes
 ignored-modules=
-ignored-classes=SQLObject, optparse.Values, thread._local, _thread._local
+ignored-classes=SQLObject, SQLAlchemy, optparse.Values, thread._local, _thread._local
 generated-members=REQUEST,acl_users,aq_parent
 contextmanager-decorators=contextlib.contextmanager
 
