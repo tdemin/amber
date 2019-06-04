@@ -1,4 +1,4 @@
-from project_amber.app import db
+from project_amber.db import db
 
 class User(db.Model):
     """

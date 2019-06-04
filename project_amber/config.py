@@ -7,7 +7,8 @@ else:
     configPaths = ["config.json"]
 
 config = {
-    "database": ""
+    "database": "",
+    "loglevel": 0
 }
 
 # search for every file name and load the config from the first file
