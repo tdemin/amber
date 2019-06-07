@@ -36,7 +36,7 @@ def handleChecks() -> LoginUser:
     if token is None:
         raise Unauthorized
     user_session = db.session.query(Session).filter_by(token=token).one()
-    user = db.session.query(User).filter_by(id=user_session.user)
+    user = db.session.query(User).filter_by(id=user_session.user).one()
     user_details = LoginUser(user.name, user.id, token)
     return user_details
 
@@ -44,7 +44,7 @@ def addUser(name: str, password: str) -> int:
     """
     Creates a new user. Returns their ID on success.
     """
-    prehashed_pw = b64encode(sha256(password).digest())
+    prehashed_pw = b64encode(sha256(password.encode("utf8")).digest())
     hashed_pw = hashpw(prehashed_pw, gensalt())
     user = User(name=name, password=hashed_pw)
     db.session.add(user)
@@ -66,7 +66,7 @@ def verifyPassword(uid: int, password: str) -> bool:
     the passwords match, and False otherwise.
     """
     user = db.session.query(User).filter_by(id=uid).one()
-    prehashed_pw = b64encode(sha256(password).digest())
+    prehashed_pw = b64encode(sha256(password.encode("utf8")).digest())
     return checkpw(prehashed_pw, user.password)
 
 def createSession(name: str, password: str) -> str:
@@ -75,7 +75,7 @@ def createSession(name: str, password: str) -> str:
     """
     user = db.session.query(User).filter_by(name=name).one()
     if verifyPassword(user.id, password):
-        token = sha256(gensalt()).digest()
+        token = sha256(gensalt()).hexdigest()
         session = Session(token=token, user=user.id, login_time=time())
         db.session.add(session)
         db.session.commit()

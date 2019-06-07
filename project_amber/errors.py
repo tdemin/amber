@@ -2,6 +2,8 @@ from http import HTTPStatus
 
 from project_amber.logging import logError
 
+# TODO: remake these into Werkzeug exceptions
+
 class HTTPError(Exception):
     """
     Base class for all possible errors.
@@ -37,7 +39,7 @@ class InternalServerError(HTTPError):
 
 class NotFound(HTTPError):
     """
-    Exception class for users/groups/subjects not found.
+    Exception class for entities not found.
     """
     code = HTTPStatus.NOT_FOUND
     message = "Resource not found"
