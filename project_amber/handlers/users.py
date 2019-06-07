@@ -17,8 +17,8 @@ def signup():
     500 otherwise.
     """
     if not request.is_json:
-        raise BadRequest
+        raise BadRequest("The payload is not valid JSON")
     if not "name" in request.json or not "password" in request.json:
-        raise BadRequest
+        raise BadRequest("Missing 'name' or 'password'")
     addUser(request.json["name"], request.json["password"])
     return EMPTY_RESP
