@@ -6,7 +6,7 @@ from bcrypt import hashpw, gensalt, checkpw
 from flask import request
 
 from project_amber.db import db
-from project_amber.errors import Unauthorized, BadRequest
+from project_amber.errors import Unauthorized, BadRequest, NotFound, InternalServerError
 from project_amber.models.auth import User, Session
 
 class LoginUser:
@@ -34,9 +34,13 @@ def handleChecks() -> LoginUser:
         raise BadRequest
     token = request.headers.get("X-Auth-Token")
     if token is None:
-        raise Unauthorized
-    user_session = db.session.query(Session).filter_by(token=token).one()
-    user = db.session.query(User).filter_by(id=user_session.user).one()
+        raise Unauthorized("No X-Auth-Token present")
+    user_session = db.session.query(Session).filter_by(token=token).first()
+    if user_session is None:
+        raise Unauthorized("Invalid token")
+    user = db.session.query(User).filter_by(id=user_session.user).first()
+    if user is None:
+        raise InternalServerError("The user is missing")
     user_details = LoginUser(user.name, user.id, token)
     return user_details
 
@@ -55,7 +59,9 @@ def removeUser(uid: int) -> int:
     """
     Removes a user given their ID. Returns their ID on success.
     """
-    user = db.session.query(User).filter_by(id=uid).one()
+    user = db.session.query(User).filter_by(id=uid).first()
+    if user is None:
+        raise NotFound("User not found")
     db.session.delete(user)
     db.session.commit()
     return uid
@@ -73,7 +79,10 @@ def createSession(name: str, password: str) -> str:
     """
     Creates a new user session. Returns an auth token.
     """
-    user = db.session.query(User).filter_by(name=name).one()
+    user = db.session.query(User).filter_by(name=name).first()
+    if user is None:
+        raise Unauthorized # this may present no sense, but the app doesn't
+        # have to reveal the presence or absence of a user in the system
     if verifyPassword(user.id, password):
         token = sha256(gensalt()).hexdigest()
         session = Session(token=token, user=user.id, login_time=time())
@@ -86,7 +95,9 @@ def removeSession(token: str) -> str:
     """
     Removes a user session by token. Returns the token on success.
     """
-    session = db.session.query(Session).filter_by(token=token).one()
+    session = db.session.query(Session).filter_by(token=token).first()
+    if session is None:
+        raise NotFound
     db.session.delete(session)
     db.session.commit()
     return token

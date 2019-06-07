@@ -1,7 +1,6 @@
 from json import dumps
 
 from flask import Flask
-from sqlalchemy.orm.exc import NoResultFound
 
 from project_amber.config import config
 from project_amber.db import db
@@ -27,10 +26,3 @@ def handle_HTTP_errors(e):
     return dumps({
         "message": e.message
     }), e.code
-
-# Hack.
-@app.errorhandler(NoResultFound)
-def handle_NoResultFound_errors(e):
-    return dumps({
-        "message": "Entity not found."
-    }), 404

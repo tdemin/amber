@@ -2,8 +2,6 @@ from http import HTTPStatus
 
 from project_amber.logging import logError
 
-# TODO: remake these into Werkzeug exceptions
-
 class HTTPError(Exception):
     """
     Base class for all possible errors.
@@ -24,42 +22,37 @@ class BadRequest(HTTPError):
     Exception class for payload data parsing errors.
     """
     code = HTTPStatus.BAD_REQUEST
-    message = "Bad request"
-    def __init__(self):
-        super().__init__(self.code, self.message)
+    def __init__(self, message="Bad request payload"):
+        super().__init__(self.code, message)
 
 class InternalServerError(HTTPError):
     """
     Exception class for DB errors. Probably going to be left unused.
     """
     code = HTTPStatus.INTERNAL_SERVER_ERROR
-    message = "Internal server error"
-    def __init__(self):
-        super().__init__(self.code, self.message)
+    def __init__(self, message="Internal error"):
+        super().__init__(self.code, message)
 
 class NotFound(HTTPError):
     """
     Exception class for entities not found.
     """
     code = HTTPStatus.NOT_FOUND
-    message = "Resource not found"
-    def __init__(self):
-        super().__init__(self.code, self.message)
+    def __init__(self, message="Entity not found"):
+        super().__init__(self.code, message)
 
 class NoAccess(HTTPError):
     """
     Exception class for restricted access areas.
     """
     code = HTTPStatus.FORBIDDEN
-    message = "Access denied"
-    def __init__(self):
-        super().__init__(self.code, self.message)
+    def __init__(self, message="Forbidden"):
+        super().__init__(self.code, message)
 
 class Unauthorized(HTTPError):
     """
     Exception class for login/auth check errors.
     """
     code = HTTPStatus.UNAUTHORIZED
-    message = "Unauthorized"
-    def __init__(self):
-        super().__init__(self.code, self.message)
+    def __init__(self, message="Unauthorized"):
+        super().__init__(self.code, message)
