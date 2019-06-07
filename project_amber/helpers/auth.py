@@ -84,7 +84,7 @@ def createSession(name: str, password: str) -> str:
         raise Unauthorized # this may present no sense, but the app doesn't
         # have to reveal the presence or absence of a user in the system
     if verifyPassword(user.id, password):
-        token = sha256(gensalt()).hexdigest()
+        token = sha256(gensalt() + bytes(str(time()).encode())).hexdigest()
         session = Session(token=token, user=user.id, login_time=time())
         db.session.add(session)
         db.session.commit()
