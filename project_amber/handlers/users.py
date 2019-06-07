@@ -13,8 +13,8 @@ def signup():
         "password": "some_password"
     }
     ```
-    Returns HTTP 200 with empty JSON on success, 400 on missing params,
-    500 otherwise.
+    Returns HTTP 200 with empty JSON on success, 400 on missing params, 500
+    otherwise.
     """
     if not request.is_json:
         raise BadRequest("The payload is not valid JSON")
