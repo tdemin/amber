@@ -5,6 +5,7 @@ from time import time
 from bcrypt import hashpw, gensalt, checkpw
 from flask import request
 
+from project_amber.const import MSG_NO_TOKEN, MSG_INVALID_TOKEN, MSG_USER_NOT_FOUND
 from project_amber.db import db
 from project_amber.errors import Unauthorized, BadRequest, NotFound, InternalServerError
 from project_amber.models.auth import User, Session
@@ -34,13 +35,13 @@ def handleChecks() -> LoginUser:
         raise BadRequest
     token = request.headers.get("X-Auth-Token")
     if token is None:
-        raise Unauthorized("No X-Auth-Token present")
+        raise Unauthorized(MSG_NO_TOKEN)
     user_session = db.session.query(Session).filter_by(token=token).first()
     if user_session is None:
-        raise Unauthorized("Invalid token")
+        raise Unauthorized(MSG_INVALID_TOKEN)
     user = db.session.query(User).filter_by(id=user_session.user).first()
     if user is None:
-        raise InternalServerError("The user is missing")
+        raise InternalServerError(MSG_USER_NOT_FOUND)
     user_details = LoginUser(user.name, user.id, token)
     return user_details
 
@@ -61,7 +62,7 @@ def removeUser(uid: int) -> int:
     """
     user = db.session.query(User).filter_by(id=uid).first()
     if user is None:
-        raise NotFound("User not found")
+        raise NotFound(MSG_USER_NOT_FOUND)
     db.session.delete(user)
     db.session.commit()
     return uid
