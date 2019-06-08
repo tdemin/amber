@@ -23,6 +23,7 @@ def updateTask(new_text: str, task_id: int, uid: int) -> int:
     if task is None:
         raise NotFound(MSG_TASK_NOT_FOUND)
     task.text = new_text
+    task.last_mod_time = time()
     db.session.commit()
     return task_id
 
