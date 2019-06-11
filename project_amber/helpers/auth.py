@@ -36,10 +36,10 @@ def handleChecks() -> LoginUser:
     token = request.headers.get("X-Auth-Token")
     if token is None:
         raise Unauthorized(MSG_NO_TOKEN)
-    user_session = db.session.query(Session).filter_by(token=token).first()
+    user_session = db.session.query(Session).filter_by(token=token).one_or_none()
     if user_session is None:
         raise Unauthorized(MSG_INVALID_TOKEN)
-    user = db.session.query(User).filter_by(id=user_session.user).first()
+    user = db.session.query(User).filter_by(id=user_session.user).one_or_none()
     if user is None:
         raise InternalServerError(MSG_USER_NOT_FOUND)
     user_details = LoginUser(user.name, user.id, token)
@@ -60,7 +60,7 @@ def removeUser(uid: int) -> int:
     """
     Removes a user given their ID. Returns their ID on success.
     """
-    user = db.session.query(User).filter_by(id=uid).first()
+    user = db.session.query(User).filter_by(id=uid).one_or_none()
     if user is None:
         raise NotFound(MSG_USER_NOT_FOUND)
     db.session.delete(user)
@@ -80,7 +80,7 @@ def createSession(name: str, password: str) -> str:
     """
     Creates a new user session. Returns an auth token.
     """
-    user = db.session.query(User).filter_by(name=name).first()
+    user = db.session.query(User).filter_by(name=name).one_or_none()
     if user is None:
         raise Unauthorized # this may present no sense, but the app doesn't
         # have to reveal the presence or absence of a user in the system
@@ -96,7 +96,7 @@ def removeSession(token: str) -> str:
     """
     Removes a user session by token. Returns the token on success.
     """
-    session = db.session.query(Session).filter_by(token=token).first()
+    session = db.session.query(Session).filter_by(token=token).one_or_none()
     if session is None:
         raise NotFound
     db.session.delete(session)

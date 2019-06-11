@@ -19,7 +19,7 @@ def updateTask(new_text: str, task_id: int, uid: int) -> int:
     """
     Updates the task text. Returns its ID.
     """
-    task = db.session.query(Task).filter_by(id=task_id, owner=uid).first()
+    task = db.session.query(Task).filter_by(id=task_id, owner=uid).one_or_none()
     if task is None:
         raise NotFound(MSG_TASK_NOT_FOUND)
     task.text = new_text
@@ -32,7 +32,7 @@ def removeTask(task_id: int, uid: int) -> int:
     """
     Removes a task. Returns its ID on success.
     """
-    task = db.session.query(Task).filter_by(id=task_id, owner=uid).first()
+    task = db.session.query(Task).filter_by(id=task_id, owner=uid).one_or_none()
     if task is None:
         raise NotFound(MSG_TASK_NOT_FOUND)
     db.session.delete(task)
