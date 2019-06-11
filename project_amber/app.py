@@ -6,6 +6,8 @@ from project_amber.config import config
 from project_amber.db import db
 from project_amber.errors import HTTPError
 from project_amber.handlers.auth import login, logout, login_check
+from project_amber.handlers.task import handle_task_id_request, \
+    handle_task_request
 from project_amber.handlers.users import signup
 
 app = Flask(__name__)
@@ -14,8 +16,13 @@ db.init_app(app)
 
 app.add_url_rule("/api/login", "login", login, methods=["POST"])
 app.add_url_rule("/api/logout", "logout", logout, methods=["POST"])
-app.add_url_rule("/api/login_check", "login_check", login_check, methods=["GET"])
+app.add_url_rule("/api/login_check", "login_check", login_check, \
+    methods=["GET"])
 app.add_url_rule("/api/signup", "signup", signup, methods=["POST"])
+app.add_url_rule("/api/task", "task", handle_task_request, \
+    methods=["GET", "POST"])
+app.add_url_rule("/api/task/<task_id>", "task_id", handle_task_id_request, \
+    methods=["GET", "PATCH", "DELETE"])
 
 @app.before_first_request
 def create_tables():

@@ -3,8 +3,10 @@ from json import dumps
 from flask import request
 
 from project_amber.const import EMPTY_RESP
+from project_amber.errors import BadRequest
 from project_amber.helpers.auth import handleChecks
-from project_amber.helpers.task import addTask, updateTask, removeTask
+from project_amber.helpers.task import addTask, getTask, getTasks, \
+    updateTask, removeTask
 
 def handle_task_request():
     """
@@ -18,11 +20,13 @@ def handle_task_request():
             {
                 "id": 123,
                 "text": "Some task",
+                "status:": 1,
                 "last_mod": 12345 // timestamp
             },
             {
                 "id": 456,
                 "text": "Some text",
+                "status": 0,
                 "last_mod": 12346
             }
         ]
@@ -34,21 +38,72 @@ def handle_task_request():
         "text": "Some task"
     }
     ```
+    with a task ID.
     """
     user = handleChecks()
     if request.method == "GET":
-        pass
-    elif request.method == "POST":
-        pass
+        query = None
+        if "query" in request.json:
+            query = request.json["query"]
+        tasks = getTasks(user.id, query)
+        tasksList = []
+        for task in tasks:
+            tasksList.append({
+                "id": task.id,
+                "text": task.text,
+                "status": task.status,
+                "last_mod": task.last_mod_time
+            })
+        return dumps({
+            "tasks": tasksList
+        })
+    if request.method == "POST":
+        if not "text" in request.json:
+            raise BadRequest("No text specified")
+        text = request.json["text"]
+        new_id = addTask(text, user.id)
+        return dumps({ "id": new_id })
 
 def handle_task_id_request(task_id: int):
     """
     Handles requests to `/api/task/<id>`. Accepts GET, PATCH, and DELETE.
+    On GET, the user gets this response with HTTP 200 (or 404, if the task
+    does not exist):
+    ```
+    {
+        "id": 1,
+        "text": "Some text",
+        "status": 1,
+        "last_mod": 123456 // timestamp
+    }
+    ```
+    On PATCH and DELETE the user will get HTTP 200 with an empty response. On
+    PATCH, this request body is expected (all of the parameters are optional):
+    ```
+    {
+        "text": "New task text",
+        "status": 1 // new status
+    }
+    ```
     """
     user = handleChecks()
     if request.method == "GET":
-        pass
+        task = getTask(task_id, user.id)
+        return dumps({
+            "id": task.id,
+            "text": task.text,
+            "status": task.status,
+            "last_mod": task.last_mod_time
+        })
     elif request.method == "PATCH":
-        pass
+        text = None
+        status = None
+        if "text" in request.json:
+            text = request.json["text"]
+        if "status" in request.json:
+            status = request.json["status"]
+        updateTask(task_id, user.id, text=text, status=status)
+        return EMPTY_RESP
     elif request.method == "DELETE":
-        pass
+        removeTask(task_id, user.id)
+        return EMPTY_RESP

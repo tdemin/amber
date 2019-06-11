@@ -8,8 +8,9 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     owner = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     text = db.Column(db.String(65536)) # TODO: probably subject to increase
+    status = db.Column(db.Integer, nullable=False)
     creation_time = db.Column(db.Integer, nullable=False)
     last_mod_time = db.Column(db.Integer, nullable=False)
     def __repr__(self):
-        return "<Task id='%d' owner='%d' text='%s' creation_time='%d'>" \
-            % self.id, self.owner, self.text, self.creation_time
+        return "<Task id='%d' owner='%d' text='%s' status='%d' created='%d'>" \
+            % self.id, self.owner, self.text, self.status, self.creation_time
