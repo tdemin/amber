@@ -36,3 +36,7 @@ except OSError as ioerr:
 for entry in config:
     if entry in loadedConfig:
         config[entry] = loadedConfig[entry]
+
+if config["database"] == "":
+    print("No database specified. Exiting.")
+    exit(1)
