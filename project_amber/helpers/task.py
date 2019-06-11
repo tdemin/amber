@@ -36,7 +36,7 @@ def getTasks(uid: int, text: str = None) -> list:
     req = db.session.query(Task).filter_by(owner=uid)
     if text is None:
         return req.all()
-    return req.filter(text in Task.text).all()
+    return req.filter(Task.text.ilike("%{0}%".format(text))).all()
 
 def updateTask(task_id: int, uid: int, **kwargs) -> int:
     """
