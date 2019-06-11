@@ -17,9 +17,13 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3"
     ],
-    keywords="notes backend flask",
+    keywords="tasks backend flask",
     # project_urls={}
     packages=["project_amber"],
-    install_requires=["flask"],
+    install_requires=[
+        "flask",
+        "flask-sqlalchemy",
+        "bcrypt"
+    ],
     python_requires=">=3.6"
 )
