@@ -18,11 +18,13 @@ app.add_url_rule("/api/login", "login", login, methods=["POST"])
 app.add_url_rule("/api/logout", "logout", logout, methods=["POST"])
 app.add_url_rule("/api/login_check", "login_check", login_check, \
     methods=["GET"])
-app.add_url_rule("/api/signup", "signup", signup, methods=["POST"])
 app.add_url_rule("/api/task", "task", handle_task_request, \
     methods=["GET", "POST"])
 app.add_url_rule("/api/task/<task_id>", "task_id", handle_task_id_request, \
     methods=["GET", "PATCH", "DELETE"])
+
+if config["allow_signup"]:
+    app.add_url_rule("/api/signup", "signup", signup, methods=["POST"])
 
 @app.before_first_request
 def create_tables():

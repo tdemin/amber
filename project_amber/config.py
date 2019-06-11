@@ -8,7 +8,8 @@ else:
 
 config = {
     "database": "",
-    "loglevel": 0
+    "loglevel": 0,
+    "allow_signup": False
 }
 
 # search for every file name and load the config from the first file
