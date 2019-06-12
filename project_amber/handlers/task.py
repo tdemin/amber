@@ -61,7 +61,11 @@ def handle_task_request():
         if not "text" in request.json:
             raise BadRequest("No text specified")
         text = request.json["text"]
-        new_id = addTask(text, user.id)
+        status = request.json.get("status")
+        # if only I could `get("status", d=0)` like we do that with dicts
+        if status is None:
+            status = 0
+        new_id = addTask(text, status, user.id)
         return dumps({ "id": new_id })
 
 def handle_task_id_request(task_id: int):
@@ -95,7 +99,7 @@ def handle_task_id_request(task_id: int):
             "status": task.status,
             "last_mod": task.last_mod_time
         })
-    elif request.method == "PATCH":
+    if request.method == "PATCH":
         text = None
         status = None
         if "text" in request.json:
@@ -104,6 +108,6 @@ def handle_task_id_request(task_id: int):
             status = request.json["status"]
         updateTask(task_id, user.id, text=text, status=status)
         return EMPTY_RESP
-    elif request.method == "DELETE":
+    if request.method == "DELETE":
         removeTask(task_id, user.id)
         return EMPTY_RESP

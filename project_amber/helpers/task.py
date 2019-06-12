@@ -5,15 +5,13 @@ from project_amber.db import db
 from project_amber.errors import NotFound
 from project_amber.models.task import Task
 
-def addTask(text: str, uid: int, **kwargs) -> int:
+def addTask(text: str, status: int, uid: int) -> int:
     """
     Creates a new task. Returns its ID.
     """
-    status = 0
-    if "status" in kwargs:
-        status = kwargs["status"]
-    task = Task(owner=uid, text=text, creation_time=time(), \
-        last_mod_time=time(), status=status)
+    task_time = time()
+    task = Task(owner=uid, text=text, creation_time=task_time, \
+        last_mod_time=task_time, status=status)
     db.session.add(task)
     db.session.commit()
     return task.id
