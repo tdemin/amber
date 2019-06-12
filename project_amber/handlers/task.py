@@ -42,9 +42,8 @@ def handle_task_request():
     """
     user = handleChecks()
     if request.method == "GET":
-        query = None
-        if "query" in request.json:
-            query = request.json["query"]
+        query = request.json.get("query")
+        # `query` is OK to be `None`
         tasks = getTasks(user.id, query)
         tasksList = []
         for task in tasks:
@@ -58,9 +57,9 @@ def handle_task_request():
             "tasks": tasksList
         })
     if request.method == "POST":
-        if not "text" in request.json:
+        text = request.json.get("text")
+        if text is None:
             raise BadRequest("No text specified")
-        text = request.json["text"]
         status = request.json.get("status")
         # if only I could `get("status", d=0)` like we do that with dicts
         if status is None:
@@ -100,12 +99,9 @@ def handle_task_id_request(task_id: int):
             "last_mod": task.last_mod_time
         })
     if request.method == "PATCH":
-        text = None
-        status = None
-        if "text" in request.json:
-            text = request.json["text"]
-        if "status" in request.json:
-            status = request.json["status"]
+        text = request.json.get("text")
+        status = request.json.get("status")
+        # these are fine to be `None`
         updateTask(task_id, user.id, text=text, status=status)
         return EMPTY_RESP
     if request.method == "DELETE":

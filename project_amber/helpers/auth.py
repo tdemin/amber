@@ -5,7 +5,8 @@ from time import time
 from bcrypt import hashpw, gensalt, checkpw
 from flask import request
 
-from project_amber.const import MSG_NO_TOKEN, MSG_INVALID_TOKEN, MSG_USER_NOT_FOUND
+from project_amber.const import MSG_NO_TOKEN, MSG_INVALID_TOKEN, \
+    MSG_USER_NOT_FOUND, MSG_USER_EXISTS
 from project_amber.db import db
 from project_amber.errors import Unauthorized, BadRequest, NotFound, \
     InternalServerError, Conflict
@@ -53,7 +54,7 @@ def addUser(name: str, password: str) -> int:
     """
     # does a user with this name already exist?
     if not db.session.query(User).filter_by(name=name).one_or_none() is None:
-        raise Conflict("The user with this name already exists")
+        raise Conflict(MSG_USER_EXISTS)
     prehashed_pw = b64encode(sha256(password.encode("utf8")).digest())
     hashed_pw = hashpw(prehashed_pw, gensalt())
     user = User(name=name, password=hashed_pw)
