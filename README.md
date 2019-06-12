@@ -16,6 +16,7 @@ Example config:
         "database": "sqlite:///file.db", // SQLAlchemy database URI
         // see https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
         "allow_signup": false // whether to allow /api/signup or not
+        "loglevel": 0 // 0: errors, 1: warnings, 2: info
     }
 
 #### Dependencies
