@@ -7,7 +7,9 @@ from flask import request
 
 from project_amber.const import MSG_NO_TOKEN, MSG_INVALID_TOKEN, MSG_USER_NOT_FOUND
 from project_amber.db import db
-from project_amber.errors import Unauthorized, BadRequest, NotFound, InternalServerError
+from project_amber.errors import Unauthorized, BadRequest, NotFound, \
+    InternalServerError, Conflict
+from project_amber.logging import log
 from project_amber.models.auth import User, Session
 
 class LoginUser:
@@ -49,9 +51,13 @@ def addUser(name: str, password: str) -> int:
     """
     Creates a new user. Returns their ID on success.
     """
+    # does a user with this name already exist?
+    if not db.session.query(User).filter_by(name=name).one_or_none() is None:
+        raise Conflict("The user with this name already exists")
     prehashed_pw = b64encode(sha256(password.encode("utf8")).digest())
     hashed_pw = hashpw(prehashed_pw, gensalt())
     user = User(name=name, password=hashed_pw)
+    log("Adding user %s..." % name)
     db.session.add(user)
     db.session.commit()
     return user.id
@@ -63,6 +69,7 @@ def removeUser(uid: int) -> int:
     user = db.session.query(User).filter_by(id=uid).one_or_none()
     if user is None:
         raise NotFound(MSG_USER_NOT_FOUND)
+    log("Removing user %s..." % user.name)
     db.session.delete(user)
     db.session.commit()
     return uid
@@ -87,6 +94,7 @@ def createSession(name: str, password: str) -> str:
     if verifyPassword(user.id, password):
         token = sha256(gensalt() + bytes(str(time()).encode())).hexdigest()
         session = Session(token=token, user=user.id, login_time=time())
+        log("User %s logged in" % user.name)
         db.session.add(session)
         db.session.commit()
         return token

@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from project_amber.logging import logError
+from project_amber.logging import warn, error
 
 class HTTPError(Exception):
     """
@@ -14,7 +14,7 @@ class HTTPError(Exception):
         """
         self.code = code
         self.message = message
-        logError(self.message)
+        warn(self.message)
         super(HTTPError, self).__init__()
 
 class BadRequest(HTTPError):
@@ -30,8 +30,9 @@ class InternalServerError(HTTPError):
     Exception class for DB errors. Probably going to be left unused.
     """
     code = HTTPStatus.INTERNAL_SERVER_ERROR
+    ## pylint: disable=super-init-not-called
     def __init__(self, message="Internal error"):
-        super().__init__(self.code, message)
+        error(message)
 
 class NotFound(HTTPError):
     """
@@ -55,4 +56,13 @@ class Unauthorized(HTTPError):
     """
     code = HTTPStatus.UNAUTHORIZED
     def __init__(self, message="Unauthorized"):
+        super().__init__(self.code, message)
+
+class Conflict(HTTPError):
+    """
+    Essentially reverse for HTTP 404: HTTP 409 Conflict. To be used on "entity
+    already exists" situations.
+    """
+    code = HTTPStatus.CONFLICT
+    def __init__(self, message="This entity already exists"):
         super().__init__(self.code, message)
