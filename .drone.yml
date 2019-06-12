@@ -1,0 +1,9 @@
+kind: pipeline
+name: Python linting
+
+steps:
+- name: pylint
+  image: python:3.7-stretch
+  commands:
+  - pip install pylint
+  - pylint project_amber
