@@ -68,7 +68,7 @@ def updateTask(task_id: int, uid: int, **kwargs) -> int:
         # TODO: we limit changing parent IDs to prevent circular deps,
         # can this be done better?
         new_parent = getTask(kwargs["parent_id"], uid)
-        if new_parent.gen > task.gen:
+        if new_parent.gen > task.gen and task.is_child():
             raise BadRequest(MSG_TASK_DANGEROUS)
         task.parent_id = new_parent.id
         updateChildren(task.id)
