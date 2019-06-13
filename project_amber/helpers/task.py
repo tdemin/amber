@@ -1,8 +1,7 @@
-from time import time
-
 from project_amber.const import MSG_TASK_NOT_FOUND, MSG_TASK_DANGEROUS
 from project_amber.db import db
 from project_amber.errors import NotFound, BadRequest
+from project_amber.helpers import time
 from project_amber.models.task import Task
 
 def addTask(text: str, status: int, uid: int) -> int:

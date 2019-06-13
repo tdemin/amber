@@ -1,6 +1,5 @@
 from hashlib import sha256
 from base64 import b64encode
-from time import time
 
 from bcrypt import hashpw, gensalt, checkpw
 from flask import request
@@ -8,6 +7,7 @@ from flask import request
 from project_amber.const import MSG_NO_TOKEN, MSG_INVALID_TOKEN, \
     MSG_USER_NOT_FOUND, MSG_USER_EXISTS
 from project_amber.db import db
+from project_amber.helpers import time
 from project_amber.errors import Unauthorized, BadRequest, NotFound, \
     InternalServerError, Conflict
 from project_amber.logging import log
