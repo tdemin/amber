@@ -7,6 +7,7 @@ from project_amber.const import MATURE_SESSION, MSG_IMMATURE_SESSION, EMPTY_RESP
 from project_amber.errors import Forbidden
 from project_amber.helpers.auth import handleChecks, getSessions, getSession,\
     removeSessionById
+from project_amber.logging import log
 
 def handle_session_req():
     """
@@ -70,4 +71,8 @@ def handle_session_id_req(session_id: int):
         if (time() - user.login_time) < MATURE_SESSION:
             raise Forbidden(MSG_IMMATURE_SESSION)
         removeSessionById(session_id, user.id)
+        log("User {0} deleted session {1}".format(
+            user.name,
+            session_id
+        ))
         return EMPTY_RESP

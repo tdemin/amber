@@ -6,6 +6,7 @@ from project_amber.const import EMPTY_RESP
 from project_amber.errors import BadRequest
 from project_amber.helpers.auth import handleChecks, removeSession, \
     createSession
+from project_amber.logging import log
 
 def login():
     """
@@ -37,4 +38,5 @@ def logout():
     """
     user = handleChecks()
     removeSession(user.token, user.id)
+    log("User %s logged out" % user.name)
     return EMPTY_RESP
