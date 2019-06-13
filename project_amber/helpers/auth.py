@@ -94,8 +94,12 @@ def createSession(name: str, password: str) -> str:
         # have to reveal the presence or absence of a user in the system
     if verifyPassword(user.id, password):
         token = sha256(gensalt() + bytes(str(time()).encode())).hexdigest()
-        session = Session(token=token, user=user.id, login_time=time())
-        log("User %s logged in" % user.name)
+        session = Session(token=token, user=user.id, login_time=time(), \
+            address=request.remote_addr)
+        log("User {0} logged in from {1}".format(
+            user.name,
+            request.remote_addr
+        ))
         db.session.add(session)
         db.session.commit()
         return token

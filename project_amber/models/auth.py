@@ -18,6 +18,7 @@ class Session(db.Model):
     token = db.Column(db.String(256), primary_key=True)
     user = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     login_time = db.Column(db.Integer, nullable=False)
+    address = db.Column(db.String(100), nullable=False)
     def __repr__(self):
-        return "<Session token='%s' user='%d' login_time='%d'>" % \
-            self.token, self.user, self.login_time
+        return "<Session token='%s' user='%d' login_time='%d' ip='%s'>" % \
+            self.token, self.user, self.login_time, self.address
