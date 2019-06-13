@@ -37,6 +37,30 @@ for entry in config:
     if entry in loadedConfig:
         config[entry] = loadedConfig[entry]
 
+def string_to_bool(val: str) -> bool:
+    """
+    Converts a string containing a bool value to Python's bool. Serves as a
+    helper in configuration code.
+    """
+    if val == "1" or val.lower() == "true":
+        return True
+    if val == "0" or val.lower() == "false":
+        return False
+    return False
+
+# override config with environment variables in need, the first element of a
+# tuple is the environment variable itself, the second is the corresponding
+# `config` key, and the third one is the function to convert the possible values
+for mapping in (
+    ("AMBER_DATABASE", "database", lambda val: val), # str -> str
+    # pylint: disable=unnecessary-lambda
+    ("AMBER_LOGLEVEL", "loglevel", lambda val: int(val)), # str -> int
+    ("AMBER_ALLOW_SIGNUP", "allow_signup", string_to_bool) # str -> bool
+):
+    env_value = os.getenv(mapping[0])
+    if not env_value is None:
+        config[mapping[1]] = mapping[2](env_value)
+
 if config["database"] == "":
     print("No database specified. Exiting.")
     exit(1)

@@ -19,6 +19,10 @@ Example config:
         "loglevel": 0 // 0: errors, 1: warnings, 2: info
     }
 
+If there are environment variables `AMBER_DATABASE` / `AMBER_ALLOW_SIGNUP` /
+`AMBER_LOGLEVEL` set, the program will respect them and use over the values
+provided with the config file.
+
 #### Dependencies
 
 This app directly depends on `flask`, `flask-sqlalchemy`, and `bcrypt`.
