@@ -27,7 +27,8 @@ def handle_task_request():
                 "id": 456,
                 "text": "Some text",
                 "status": 0,
-                "last_mod": 12346
+                "last_mod": 12346,
+                "parent_id": 123
             }
         ]
     }
@@ -53,6 +54,8 @@ def handle_task_request():
                 "status": task.status,
                 "last_mod": task.last_mod_time
             })
+            if not task.parent_id is None:
+                tasksList[len(tasksList) - 1]["parent_id"] = task.parent_id
         return dumps({
             "tasks": tasksList
         })
@@ -74,10 +77,11 @@ def handle_task_id_request(task_id: int):
     does not exist):
     ```
     {
-        "id": 1,
+        "id": 123,
         "text": "Some text",
         "status": 1,
-        "last_mod": 123456 // timestamp
+        "last_mod": 123456, // timestamp
+        "parent_id": 11 // if applicable
     }
     ```
     On PATCH and DELETE the user will get HTTP 200 with an empty response. On
@@ -85,24 +89,30 @@ def handle_task_id_request(task_id: int):
     ```
     {
         "text": "New task text",
-        "status": 1 // new status
+        "status": 1, // new status
+        "parent_id": 123 // if applicable
     }
     ```
     """
     user = handleChecks()
     if request.method == "GET":
         task = getTask(task_id, user.id)
-        return dumps({
+        response = {
             "id": task.id,
             "text": task.text,
             "status": task.status,
             "last_mod": task.last_mod_time
-        })
+        }
+        if not task.parent_id is None:
+            response["parent_id"] = task.parent_id
+        return dumps(response)
     if request.method == "PATCH":
         text = request.json.get("text")
         status = request.json.get("status")
+        parent_id = request.json.get("parent_id")
         # these are fine to be `None`
-        updateTask(task_id, user.id, text=text, status=status)
+        updateTask(task_id, user.id,
+            text=text, status=status, parent_id=parent_id)
         return EMPTY_RESP
     if request.method == "DELETE":
         removeTask(task_id, user.id)
