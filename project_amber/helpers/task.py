@@ -65,13 +65,18 @@ def updateTask(task_id: int, uid: int, **kwargs) -> int:
     if "status" in kwargs and not kwargs["status"] is None:
         task.status = kwargs["status"]
     if "parent_id" in kwargs and not kwargs["parent_id"] is None:
-        # TODO: we limit changing parent IDs to prevent circular deps,
-        # can this be done better?
-        new_parent = getTask(kwargs["parent_id"], uid)
-        if new_parent.gen > task.gen and task.is_child():
-            raise BadRequest(MSG_TASK_DANGEROUS)
-        task.parent_id = new_parent.id
-        updateChildren(task.id)
+        if kwargs["parent_id"] == 0:
+            # promote task to the top level
+            task.parent_id = None
+            updateChildren(task.id)
+        else:
+            # TODO: we limit changing parent IDs to prevent circular deps,
+            # can this be done better?
+            new_parent = getTask(kwargs["parent_id"], uid)
+            if new_parent.gen > task.gen and task.is_child():
+                raise BadRequest(MSG_TASK_DANGEROUS)
+            task.parent_id = new_parent.id
+            updateChildren(task.id)
     task.last_mod_time = time()
     db.session.commit()
     return task_id
