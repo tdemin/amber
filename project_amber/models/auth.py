@@ -15,7 +15,8 @@ class Session(db.Model):
     """
     Holds auth session details (auth token, the time of login, etc).
     """
-    token = db.Column(db.String(256), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(256), unique=True, nullable=False)
     user = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     login_time = db.Column(db.Integer, nullable=False)
     address = db.Column(db.String(100), nullable=False)

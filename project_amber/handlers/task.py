@@ -2,7 +2,7 @@ from json import dumps
 
 from flask import request
 
-from project_amber.const import EMPTY_RESP
+from project_amber.const import EMPTY_RESP, MSG_TEXT_NOT_SPECIFIED
 from project_amber.errors import BadRequest
 from project_amber.helpers.auth import handleChecks
 from project_amber.helpers.task import addTask, getTask, getTasks, \
@@ -59,7 +59,7 @@ def handle_task_request():
     if request.method == "POST":
         text = request.json.get("text")
         if text is None:
-            raise BadRequest("No text specified")
+            raise BadRequest(MSG_TEXT_NOT_SPECIFIED)
         status = request.json.get("status")
         # if only I could `get("status", d=0)` like we do that with dicts
         if status is None:

@@ -42,7 +42,7 @@ class NotFound(HTTPError):
     def __init__(self, message="Entity not found"):
         super().__init__(self.code, message)
 
-class NoAccess(HTTPError):
+class Forbidden(HTTPError):
     """
     Exception class for restricted access areas.
     """

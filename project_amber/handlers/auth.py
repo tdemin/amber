@@ -7,14 +7,6 @@ from project_amber.errors import BadRequest
 from project_amber.helpers.auth import handleChecks, removeSession, \
     createSession
 
-def login_check():
-    """
-    Essentially a heartbeat request that drops HTTP 401 when
-    unauthorized. Returns HTTP 200 with an empty response if otherwise.
-    """
-    handleChecks()
-    return EMPTY_RESP
-
 def login():
     """
     Login handler. Accepts this JSON:
@@ -44,5 +36,5 @@ def logout():
     Logout handler. Accepts empty JSON. Returns HTTP 200 on success.
     """
     user = handleChecks()
-    removeSession(user.token)
+    removeSession(user.token, user.id)
     return EMPTY_RESP

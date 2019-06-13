@@ -19,10 +19,11 @@ class LoginUser:
     and ID. The corresponding fields are `name` and `id`, respectively.
     Also contains a token field.
     """
-    def __init__(self, name: str, uid: int, token: str):
+    def __init__(self, name: str, uid: int, token: str, login_time: int):
         self.name = name
         self.id = uid
         self.token = token
+        self.login_time = login_time
 
 def handleChecks() -> LoginUser:
     """
@@ -45,7 +46,7 @@ def handleChecks() -> LoginUser:
     user = db.session.query(User).filter_by(id=user_session.user).one_or_none()
     if user is None:
         raise InternalServerError(MSG_USER_NOT_FOUND)
-    user_details = LoginUser(user.name, user.id, token)
+    user_details = LoginUser(user.name, user.id, token, user_session.login_time)
     return user_details
 
 def addUser(name: str, password: str) -> int:
@@ -105,13 +106,43 @@ def createSession(name: str, password: str) -> str:
         return token
     raise Unauthorized
 
-def removeSession(token: str) -> str:
+def removeSession(token: str, uid: int) -> str:
     """
     Removes a user session by token. Returns the token on success.
     """
-    session = db.session.query(Session).filter_by(token=token).one_or_none()
+    session = db.session.query(Session).filter_by(token=token, user=uid)\
+        .one_or_none()
     if session is None:
         raise NotFound
     db.session.delete(session)
     db.session.commit()
     return token
+
+def removeSessionById(session_id: int, uid: int) -> int:
+    """
+    Removes a user session by session ID. Returns the session ID on success.
+    """
+    session = db.session.query(Session).filter_by(id=session_id, user=uid)\
+        .one_or_none()
+    if session is None:
+        raise NotFound
+    db.session.delete(session)
+    db.session.commit()
+    return session_id
+
+def getSessions(uid: int) -> list:
+    """
+    Returns a list of sessions of a user (class `Session`).
+    """
+    sessions = db.session.query(Session).filter_by(user=uid).all()
+    return sessions
+
+def getSession(session_id: int, uid: int) -> Session:
+    """
+    Returns a single `Session` by its ID.
+    """
+    session = db.session.query(Session).filter_by(id=session_id, user=uid)\
+        .one_or_none()
+    if session is None:
+        raise NotFound
+    return session
