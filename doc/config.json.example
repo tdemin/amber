@@ -1,0 +1,5 @@
+{
+    "database": "sqlite:////data/amber.db",
+    "allow_signup": true,
+    "loglevel": 2
+}
