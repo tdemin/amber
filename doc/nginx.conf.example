@@ -1,0 +1,8 @@
+server {
+    listen 80 default_server;
+    location / { try_files $uri @amber; }
+    location @amber {
+        include uwsgi_params;
+        uwsgi_pass amber:8080;
+    }
+}
