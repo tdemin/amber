@@ -8,3 +8,20 @@ steps:
   - pip install pylint
   - pip install -r requirements.txt
   - pylint project_amber
+- name: push to registry
+  image: plugins/docker
+  settings:
+    username:
+      from_secret: username
+    password:
+      from_secret: password
+    repo: registry.git.tdem.in/amber
+    registry: registry.git.tdem.in
+    auto_tag: true
+    dockerfile: Dockerfile
+  when:
+    branch:
+    - master
+    event:
+    - push
+    - tag
