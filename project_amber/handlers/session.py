@@ -4,7 +4,7 @@ from flask import request
 
 from project_amber.const import MATURE_SESSION, MSG_IMMATURE_SESSION, EMPTY_RESP
 from project_amber.errors import Forbidden
-from project_amber.helpers import time, handleChecks
+from project_amber.helpers import time
 from project_amber.helpers.auth import getSessions, getSession,removeSessionById
 from project_amber.logging import log
 
@@ -29,8 +29,7 @@ def handle_session_req():
     }
     ```
     """
-    user = handleChecks()
-    sessions = getSessions(user.id)
+    sessions = getSessions()
     sessionList = []
     for session in sessions:
         sessionList.append({
@@ -58,20 +57,19 @@ def handle_session_id_req(session_id: int):
     case here: if a client session is too recent, this will respond with
     HTTP 403.
     """
-    user = handleChecks()
     if request.method == "GET":
-        session = getSession(session_id, user.id)
+        session = getSession(session_id)
         return dumps({
             "id": session.id,
             "login_time": session.login_time,
             "address": session.address
         })
     if request.method == "DELETE":
-        if (time() - user.login_time) < MATURE_SESSION:
+        if (time() - request.user.login_time) < MATURE_SESSION:
             raise Forbidden(MSG_IMMATURE_SESSION)
-        removeSessionById(session_id, user.id)
+        removeSessionById(session_id)
         log("User {0} deleted session {1}".format(
-            user.name,
+            request.user.name,
             session_id
         ))
         return EMPTY_RESP

@@ -1,4 +1,5 @@
 from time import time as time_lib
+from functools import wraps
 
 from flask import request
 
@@ -21,18 +22,32 @@ class LoginUser:
         self.token = token
         self.login_time = login_time
 
-def handleChecks() -> LoginUser:
+class RequestParams:
+    """
+    Representational class for request parameters.
+    """
+    def __init__(self):
+        self.authenticated = False
+
+def middleware() -> RequestParams:
+    """
+    Simple middleware. Checks for invalid request payloads, drops errors
+    on need, etc.
+    Returns `True` if a request needs to be authenticated, `False` otherwise.
+    """
+    if not request.is_json and request.method in ["POST", "PUT", "PATCH"]:
+        raise BadRequest
+    params = RequestParams()
+    if not request.path in ["/api/login", "/api/signup"]:
+        params.authenticated = True
+    return params
+
+def handleLogin() -> LoginUser:
     """
     Login handler. Works with Flask's `request`. Returns an object
     containing the user's name and their ID. Raises an exception if
     the auth token is not valid.
-
-    This is essentially a request decorator that is implemented as a
-    function. This also checks whether the request contains valid JSON,
-    and drops HTTP 400 if not.
     """
-    if not request.is_json and request.method in ["POST", "PUT", "PATCH"]:
-        raise BadRequest
     token = request.headers.get("X-Auth-Token")
     if token is None:
         raise Unauthorized(MSG_NO_TOKEN)

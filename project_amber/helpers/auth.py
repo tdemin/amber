@@ -7,8 +7,7 @@ from flask import request
 from project_amber.const import MSG_USER_NOT_FOUND, MSG_USER_EXISTS
 from project_amber.db import db
 from project_amber.helpers import time
-from project_amber.errors import Unauthorized, BadRequest, NotFound, \
-    InternalServerError, Conflict
+from project_amber.errors import Unauthorized, NotFound, Conflict
 from project_amber.logging import log
 from project_amber.models.auth import User, Session
 
@@ -69,43 +68,49 @@ def createSession(name: str, password: str) -> str:
         return token
     raise Unauthorized
 
-def removeSession(token: str, uid: int) -> str:
+def removeSession(token: str) -> str:
     """
     Removes a user session by token. Returns the token on success.
     """
-    session = db.session.query(Session).filter_by(token=token, user=uid)\
-        .one_or_none()
+    session = db.session.query(Session).filter_by(
+        token=token,
+        user=request.user.id
+    ).one_or_none()
     if session is None:
         raise NotFound
     db.session.delete(session)
     db.session.commit()
     return token
 
-def removeSessionById(session_id: int, uid: int) -> int:
+def removeSessionById(session_id: int) -> int:
     """
     Removes a user session by session ID. Returns the session ID on success.
     """
-    session = db.session.query(Session).filter_by(id=session_id, user=uid)\
-        .one_or_none()
+    session = db.session.query(Session).filter_by(
+        id=session_id,
+        user=request.user.id
+    ).one_or_none()
     if session is None:
         raise NotFound
     db.session.delete(session)
     db.session.commit()
     return session_id
 
-def getSessions(uid: int) -> list:
+def getSessions() -> list:
     """
     Returns a list of sessions of a user (class `Session`).
     """
-    sessions = db.session.query(Session).filter_by(user=uid).all()
+    sessions = db.session.query(Session).filter_by(user=request.user.id).all()
     return sessions
 
-def getSession(session_id: int, uid: int) -> Session:
+def getSession(session_id: int) -> Session:
     """
     Returns a single `Session` by its ID.
     """
-    session = db.session.query(Session).filter_by(id=session_id, user=uid)\
-        .one_or_none()
+    session = db.session.query(Session).filter_by(
+        id=session_id,
+        user=request.user.id
+    ).one_or_none()
     if session is None:
         raise NotFound
     return session

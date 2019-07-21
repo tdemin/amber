@@ -4,7 +4,6 @@ from flask import request
 
 from project_amber.const import EMPTY_RESP
 from project_amber.errors import BadRequest
-from project_amber.helpers import handleChecks
 from project_amber.helpers.auth import removeSession, createSession
 from project_amber.logging import log
 
@@ -25,8 +24,6 @@ def login():
     ```
     Drops HTTP 401 on fail.
     """
-    if not request.is_json:
-        raise BadRequest
     if not "name" in request.json or not "password" in request.json:
         raise BadRequest
     token = createSession(request.json["name"], request.json["password"])
@@ -36,7 +33,6 @@ def logout():
     """
     Logout handler. Accepts empty JSON. Returns HTTP 200 on success.
     """
-    user = handleChecks()
-    removeSession(user.token, user.id)
-    log("User %s logged out" % user.name)
+    removeSession(request.user.token)
+    log("User %s logged out" % request.user.name)
     return EMPTY_RESP
