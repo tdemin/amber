@@ -16,8 +16,6 @@ def signup():
     Returns HTTP 200 with empty JSON on success, 400 on missing params, 500
     otherwise.
     """
-    if not request.is_json:
-        raise BadRequest("The payload is not valid JSON")
     if not "name" in request.json or not "password" in request.json:
         raise BadRequest("Missing 'name' or 'password'")
     addUser(request.json["name"], request.json["password"])

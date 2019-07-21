@@ -4,7 +4,6 @@ from flask import request
 
 from project_amber.const import EMPTY_RESP, MSG_TEXT_NOT_SPECIFIED
 from project_amber.errors import BadRequest
-from project_amber.helpers.auth import handleChecks
 from project_amber.helpers.task import addTask, getTask, getTasks, \
     updateTask, removeTask
 
@@ -42,11 +41,10 @@ def handle_task_request():
     ```
     with a task ID.
     """
-    user = handleChecks()
     if request.method == "GET":
         query = request.args.get("query", None)
         # `query` is OK to be `None`
-        tasks = getTasks(user.id, query)
+        tasks = getTasks(query)
         tasksList = []
         lastMod = 0
         for task in tasks:
@@ -71,7 +69,7 @@ def handle_task_request():
         # if only I could `get("status", d=0)` like we do that with dicts
         if status is None:
             status = 0
-        new_id = addTask(text, status, user.id)
+        new_id = addTask(text, status)
         return dumps({ "id": new_id })
 
 def handle_task_id_request(task_id: int):
@@ -98,9 +96,8 @@ def handle_task_id_request(task_id: int):
     }
     ```
     """
-    user = handleChecks()
     if request.method == "GET":
-        task = getTask(task_id, user.id)
+        task = getTask(task_id)
         response = {
             "id": task.id,
             "text": task.text,
@@ -115,9 +112,8 @@ def handle_task_id_request(task_id: int):
         status = request.json.get("status")
         parent_id = request.json.get("parent_id")
         # these are fine to be `None`
-        updateTask(task_id, user.id,
-            text=text, status=status, parent_id=parent_id)
+        updateTask(task_id, text=text, status=status, parent_id=parent_id)
         return EMPTY_RESP
     if request.method == "DELETE":
-        removeTask(task_id, user.id)
+        removeTask(task_id)
         return EMPTY_RESP
