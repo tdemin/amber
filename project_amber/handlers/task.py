@@ -16,6 +16,7 @@ def handle_task_request():
     With a GET request, this will be returned to an authenticated user:
     ```
     {
+        "last_mod": 12346, // the latest last_mod from task list
         "tasks": [
             {
                 "id": 123,
@@ -47,6 +48,7 @@ def handle_task_request():
         # `query` is OK to be `None`
         tasks = getTasks(user.id, query)
         tasksList = []
+        lastMod = 0
         for task in tasks:
             tasksList.append({
                 "id": task.id,
@@ -56,7 +58,9 @@ def handle_task_request():
             })
             if not task.parent_id is None:
                 tasksList[len(tasksList) - 1]["parent_id"] = task.parent_id
+            if task.last_mod_time > lastMod: lastMod = task.last_mod_time
         return dumps({
+            "last_mod": lastMod,
             "tasks": tasksList
         })
     if request.method == "POST":
