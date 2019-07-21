@@ -44,7 +44,7 @@ def handle_task_request():
     """
     user = handleChecks()
     if request.method == "GET":
-        query = request.json.get("query")
+        query = request.args.get("query", None)
         # `query` is OK to be `None`
         tasks = getTasks(user.id, query)
         tasksList = []

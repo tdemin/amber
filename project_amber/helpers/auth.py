@@ -35,7 +35,7 @@ def handleChecks() -> LoginUser:
     function. This also checks whether the request contains valid JSON,
     and drops HTTP 400 if not.
     """
-    if not request.is_json:
+    if not request.is_json and request.method in ["POST", "PUT", "PATCH"]:
         raise BadRequest
     token = request.headers.get("X-Auth-Token")
     if token is None:
