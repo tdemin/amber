@@ -4,9 +4,8 @@ from flask import request
 
 from project_amber.const import MATURE_SESSION, MSG_IMMATURE_SESSION, EMPTY_RESP
 from project_amber.errors import Forbidden
-from project_amber.helpers import time
-from project_amber.helpers.auth import handleChecks, getSessions, getSession,\
-    removeSessionById
+from project_amber.helpers import time, handleChecks
+from project_amber.helpers.auth import getSessions, getSession,removeSessionById
 from project_amber.logging import log
 
 def handle_session_req():

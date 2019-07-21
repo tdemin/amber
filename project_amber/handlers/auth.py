@@ -4,8 +4,8 @@ from flask import request
 
 from project_amber.const import EMPTY_RESP
 from project_amber.errors import BadRequest
-from project_amber.helpers.auth import handleChecks, removeSession, \
-    createSession
+from project_amber.helpers import handleChecks
+from project_amber.helpers.auth import removeSession, createSession
 from project_amber.logging import log
 
 def login():

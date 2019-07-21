@@ -4,7 +4,7 @@ from flask import request
 
 from project_amber.const import EMPTY_RESP, MSG_TEXT_NOT_SPECIFIED
 from project_amber.errors import BadRequest
-from project_amber.helpers.auth import handleChecks
+from project_amber.helpers import handleChecks
 from project_amber.helpers.task import addTask, getTask, getTasks, \
     updateTask, removeTask
 
