@@ -11,6 +11,13 @@ from project_amber.errors import Unauthorized, NotFound, Conflict
 from project_amber.logging import log
 from project_amber.models.auth import User, Session
 
+def prehash(password: str) -> bytes:
+    """
+    Returns a "normalized" representation of the password that works
+    with bcrypt even when the password is longer than 72 chars.
+    """
+    return b64encode(sha256(password.encode()).digest())
+
 def addUser(name: str, password: str) -> int:
     """
     Creates a new user. Returns their ID on success.
@@ -18,8 +25,8 @@ def addUser(name: str, password: str) -> int:
     # does a user with this name already exist?
     if not db.session.query(User).filter_by(name=name).one_or_none() is None:
         raise Conflict(MSG_USER_EXISTS)
-    prehashed_pw = b64encode(sha256(password.encode("utf8")).digest())
-    hashed_pw = hashpw(prehashed_pw, gensalt())
+    prehashed_pw = prehash(password)
+    hashed_pw = hashpw(prehashed_pw, gensalt()).decode()
     user = User(name=name, password=hashed_pw)
     log("Adding user %s..." % name)
     db.session.add(user)
@@ -44,8 +51,11 @@ def verifyPassword(uid: int, password: str) -> bool:
     the passwords match, and False otherwise.
     """
     user = db.session.query(User).filter_by(id=uid).one()
-    prehashed_pw = b64encode(sha256(password.encode("utf8")).digest())
-    return checkpw(prehashed_pw, user.password)
+    user_pass = user.password
+    if isinstance(user_pass, str):
+        user_pass = user_pass.encode()
+    prehashed_pw = prehash(password)
+    return checkpw(prehashed_pw, user_pass)
 
 def createSession(name: str, password: str) -> str:
     """
