@@ -19,8 +19,8 @@ def addTask(text: str, status: int) -> int:
 
 def getTask(task_id: int) -> Task:
     """
-    Returns an instance of `Task`, given the ID and the owner UID. If the UID
-    is `None`, returns the instance no matter who the owner is.
+    Returns an instance of `Task`, given the ID. Only returns tasks to
+    their owner.
     """
     task_query = db.session.query(Task).filter_by(id=task_id)
     task = task_query.filter_by(owner=request.user.id).one_or_none()
@@ -46,7 +46,7 @@ def updateChildren(task_id: int):
     """
     task = getTask(task_id)
     if not task.parent_id is None:
-        parent = getTask(None)
+        parent = getTask(task.parent_id)
         task.gen = parent.gen + 1
     else:
         task.gen = 0
