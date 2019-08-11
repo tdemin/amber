@@ -6,13 +6,20 @@ from project_amber.errors import NotFound, BadRequest
 from project_amber.helpers import time
 from project_amber.models.task import Task
 
-def addTask(text: str, status: int) -> int:
+def addTask(text: str, status: int, parent_id: int) -> int:
     """
     Creates a new task. Returns its ID.
     """
     task_time = time()
+    gen = 0
+    if not parent_id is None:
+        parent = db.session.query(Task)\
+            .filter_by(id=parent_id, owner=request.user.id).one_or_none()
+        if parent is None:
+            raise NotFound(MSG_TASK_NOT_FOUND)
+        gen = parent.gen + 1
     task = Task(owner=request.user.id, text=text, creation_time=task_time, \
-        last_mod_time=task_time, status=status, gen=0)
+        last_mod_time=task_time, status=status, parent_id=parent_id, gen=gen)
     db.session.add(task)
     db.session.commit()
     return task.id

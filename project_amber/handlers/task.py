@@ -69,7 +69,8 @@ def handle_task_request():
         # if only I could `get("status", d=0)` like we do that with dicts
         if status is None:
             status = 0
-        new_id = addTask(text, status)
+        parent_id = request.json.get("parent_id") # ok to be `None`
+        new_id = addTask(text, status, parent_id)
         return dumps({ "id": new_id })
 
 def handle_task_id_request(task_id: int):
