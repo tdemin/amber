@@ -8,6 +8,10 @@ steps:
   - pip install pylint
   - pip install -r requirements.txt
   - pylint project_amber
+  when:
+    branch:
+      exclude:
+      - master
 - name: push to registry
   image: plugins/docker
   settings:
