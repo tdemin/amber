@@ -12,7 +12,10 @@ def addTask(text: str, status: int, parent_id: int) -> int:
     """
     task_time = time()
     gen = 0
-    if not parent_id is None and parent_id != 0:
+    # FIXME: dirty, and is really supposed to be fixed at another level
+    if parent_id == 0:
+        parent_id = None
+    if not parent_id is None:
         parent = db.session.query(Task)\
             .filter_by(id=parent_id, owner=request.user.id).one_or_none()
         if parent is None:
