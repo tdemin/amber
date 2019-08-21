@@ -22,3 +22,19 @@ class Task(db.Model):
         if self.gen > 0:
             return True
         return False
+    def toDict(self) -> dict:
+        """
+        Helper method that converts public task data (ID, text, PID, status,
+        modtime, deadline and reminders) to a dict that can be safely used in
+        JSON serialization. Returns the resulting dict.
+        """
+        result = {
+            "id": self.id,
+            "text": self.text,
+            "status": self.status,
+            "last_mod": self.last_mod_time
+        }
+        if self.parent_id: result["parent_id"] = self.parent_id
+        if self.deadline: result["deadline"] = self.deadline
+        if self.reminder: result["reminder"] = self.reminder
+        return result

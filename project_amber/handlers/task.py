@@ -50,19 +50,7 @@ def handle_task_request():
         tasksList = []
         lastMod = 0
         for task in tasks:
-            tasksList.append({
-                "id": task.id,
-                "text": task.text,
-                "status": task.status,
-                "last_mod": task.last_mod_time
-            })
-            currentTask = tasksList[len(tasksList) - 1]
-            if not task.parent_id is None:
-                currentTask["parent_id"] = task.parent_id
-            if not task.deadline is None:
-                currentTask["deadline"] = task.deadline
-            if not task.reminder is None:
-                currentTask["reminder"] = task.reminder
+            tasksList.append(task.toDict())
             if task.last_mod_time > lastMod: lastMod = task.last_mod_time
         return dumps({
             "last_mod": lastMod,
@@ -110,15 +98,7 @@ def handle_task_id_request(task_id: int):
     """
     if request.method == "GET":
         task = getTask(task_id)
-        response = {
-            "id": task.id,
-            "text": task.text,
-            "status": task.status,
-            "last_mod": task.last_mod_time
-        }
-        if not task.parent_id is None: response["parent_id"] = task.parent_id
-        if not task.deadline is None: response["deadline"] = task.deadline
-        if not task.reminder is None: response["reminder"] = task.reminder
+        response = task.toDict()
         return dumps(response)
     if request.method == "PATCH":
         text = request.json.get("text")
