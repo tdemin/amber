@@ -7,12 +7,14 @@ class Task(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     owner = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    text = db.Column(db.String(65536)) # TODO: probably subject to increase
+    text = db.Column(db.String(65536))
     gen = db.Column(db.Integer, nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey("task.id"))
     status = db.Column(db.Integer, nullable=False)
     creation_time = db.Column(db.Integer, nullable=False)
     last_mod_time = db.Column(db.Integer, nullable=False)
+    deadline = db.Column(db.Integer)
+    reminder = db.Column(db.Integer)
     def is_child(self) -> bool:
         """
         Helper method. Simply checks whether the task is of gen 0 or not.
@@ -20,6 +22,19 @@ class Task(db.Model):
         if self.gen > 0:
             return True
         return False
-    def __repr__(self):
-        return "<Task id='%d' owner='%d' text='%s' status='%d' created='%d'>" \
-            % self.id, self.owner, self.text, self.status, self.creation_time
+    def toDict(self) -> dict:
+        """
+        Helper method that converts public task data (ID, text, PID, status,
+        modtime, deadline and reminders) to a dict that can be safely used in
+        JSON serialization. Returns the resulting dict.
+        """
+        result = {
+            "id": self.id,
+            "text": self.text,
+            "status": self.status,
+            "last_mod": self.last_mod_time
+        }
+        if self.parent_id: result["parent_id"] = self.parent_id
+        if self.deadline: result["deadline"] = self.deadline
+        if self.reminder: result["reminder"] = self.reminder
+        return result

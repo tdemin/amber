@@ -21,14 +21,16 @@ def handle_task_request():
                 "id": 123,
                 "text": "Some task",
                 "status:": 1,
-                "last_mod": 12345 // timestamp
+                "last_mod": 12345, // timestamp
+                "deadline": 123456
             },
             {
                 "id": 456,
                 "text": "Some text",
                 "status": 0,
                 "last_mod": 12346,
-                "parent_id": 123
+                "parent_id": 123,
+                "reminder": 123457
             }
         ]
     }
@@ -48,14 +50,7 @@ def handle_task_request():
         tasksList = []
         lastMod = 0
         for task in tasks:
-            tasksList.append({
-                "id": task.id,
-                "text": task.text,
-                "status": task.status,
-                "last_mod": task.last_mod_time
-            })
-            if not task.parent_id is None:
-                tasksList[len(tasksList) - 1]["parent_id"] = task.parent_id
+            tasksList.append(task.toDict())
             if task.last_mod_time > lastMod: lastMod = task.last_mod_time
         return dumps({
             "last_mod": lastMod,
@@ -63,14 +58,14 @@ def handle_task_request():
         })
     if request.method == "POST":
         text = request.json.get("text")
-        if text is None:
-            raise BadRequest(MSG_TEXT_NOT_SPECIFIED)
+        if text is None: raise BadRequest(MSG_TEXT_NOT_SPECIFIED)
         status = request.json.get("status")
         # if only I could `get("status", d=0)` like we do that with dicts
-        if status is None:
-            status = 0
+        if status is None: status = 0
+        deadline = request.json.get("deadline")
+        reminder = request.json.get("reminder")
         parent_id = request.json.get("parent_id") # ok to be `None`
-        new_id = addTask(text, status, parent_id)
+        new_id = addTask(text, status, parent_id, deadline, reminder)
         return dumps({ "id": new_id })
 
 def handle_task_id_request(task_id: int):
@@ -84,7 +79,9 @@ def handle_task_id_request(task_id: int):
         "text": "Some text",
         "status": 1,
         "last_mod": 123456, // timestamp
-        "parent_id": 11 // if applicable
+        "parent_id": 11, // if applicable
+        "reminder": 123456, // if applicable
+        "deadline": 123457 // if applicable
     }
     ```
     On PATCH and DELETE the user will get HTTP 200 with an empty response. On
@@ -93,27 +90,25 @@ def handle_task_id_request(task_id: int):
     {
         "text": "New task text",
         "status": 1, // new status
-        "parent_id": 123 // if applicable
+        "parent_id": 123, // if applicable
+        "deadline": 123456, // if applicable
+        "reminder": 123457, // if applicable
     }
     ```
     """
     if request.method == "GET":
         task = getTask(task_id)
-        response = {
-            "id": task.id,
-            "text": task.text,
-            "status": task.status,
-            "last_mod": task.last_mod_time
-        }
-        if not task.parent_id is None:
-            response["parent_id"] = task.parent_id
+        response = task.toDict()
         return dumps(response)
     if request.method == "PATCH":
         text = request.json.get("text")
         status = request.json.get("status")
         parent_id = request.json.get("parent_id")
+        deadline = request.json.get("deadline")
+        reminder = request.json.get("reminder")
         # these are fine to be `None`
-        updateTask(task_id, text=text, status=status, parent_id=parent_id)
+        updateTask(task_id, text=text, status=status, parent_id=parent_id, \
+            deadline=deadline, reminder=reminder)
         return EMPTY_RESP
     if request.method == "DELETE":
         removeTask(task_id)

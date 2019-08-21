@@ -1,3 +1,5 @@
+from typing import List
+
 from flask import request
 
 from project_amber.const import MSG_TASK_NOT_FOUND, MSG_TASK_DANGEROUS
@@ -6,7 +8,8 @@ from project_amber.errors import NotFound, BadRequest
 from project_amber.helpers import time
 from project_amber.models.task import Task
 
-def addTask(text: str, status: int, parent_id: int) -> int:
+def addTask(text: str, status: int, parent_id: int, deadline: int = None, \
+    reminder: int = None) -> int:
     """
     Creates a new task. Returns its ID.
     """
@@ -22,7 +25,8 @@ def addTask(text: str, status: int, parent_id: int) -> int:
             raise NotFound(MSG_TASK_NOT_FOUND)
         gen = parent.gen + 1
     task = Task(owner=request.user.id, text=text, creation_time=task_time, \
-        last_mod_time=task_time, status=status, parent_id=parent_id, gen=gen)
+        last_mod_time=task_time, status=status, parent_id=parent_id, gen=gen, \
+        deadline=deadline, reminder=reminder)
     db.session.add(task)
     db.session.commit()
     return task.id
@@ -38,7 +42,7 @@ def getTask(task_id: int) -> Task:
         raise NotFound(MSG_TASK_NOT_FOUND)
     return task
 
-def getTasks(text: str = None) -> list:
+def getTasks(text: str = None) -> List[Task]:
     """
     Returns a list containing tasks from a certain user. If the second
     parameter is specified, this will return the tasks that have this text in
@@ -86,6 +90,10 @@ def updateTask(task_id: int, **kwargs) -> int:
                 raise BadRequest(MSG_TASK_DANGEROUS)
             task.parent_id = new_parent.id
             updateChildren(task.id)
+    if "deadline" in kwargs and not kwargs["deadline"] is None:
+        task.deadline = kwargs["deadline"]
+    if "reminder" in kwargs and not kwargs["reminder"] is None:
+        task.reminder = kwargs["reminder"]
     task.last_mod_time = time()
     db.session.commit()
     return task_id
