@@ -20,6 +20,3 @@ class Task(db.Model):
         if self.gen > 0:
             return True
         return False
-    def __repr__(self):
-        return "<Task id='%d' owner='%d' text='%s' status='%d' created='%d'>" \
-            % self.id, self.owner, self.text, self.status, self.creation_time
