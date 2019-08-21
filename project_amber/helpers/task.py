@@ -8,8 +8,6 @@ from project_amber.errors import NotFound, BadRequest
 from project_amber.helpers import time
 from project_amber.models.task import Task
 
-TaskList = List[Task]
-
 def addTask(text: str, status: int, parent_id: int, deadline: int = None, \
     reminder: int = None) -> int:
     """
@@ -44,7 +42,7 @@ def getTask(task_id: int) -> Task:
         raise NotFound(MSG_TASK_NOT_FOUND)
     return task
 
-def getTasks(text: str = None) -> TaskList:
+def getTasks(text: str = None) -> List[Task]:
     """
     Returns a list containing tasks from a certain user. If the second
     parameter is specified, this will return the tasks that have this text in
