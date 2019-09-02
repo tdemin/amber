@@ -1,6 +1,7 @@
 from json import dumps
 
 from flask import Flask, request
+from flask_cors import CORS
 
 from project_amber.config import config
 from project_amber.db import db
@@ -16,6 +17,7 @@ from project_amber.handlers.users import signup
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = config["database"]
 db.init_app(app)
+CORS(app, resources={r"/*": {"origins": config["domain"]}})
 
 @app.before_request
 def middleware():

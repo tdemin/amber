@@ -24,6 +24,7 @@ setup(
     packages=["project_amber"],
     install_requires=[
         "flask",
+        "flask-cors",
         "flask-sqlalchemy",
         "bcrypt"
     ],
