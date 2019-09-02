@@ -9,7 +9,8 @@ else:
 config = {
     "database": "",
     "loglevel": 0,
-    "allow_signup": False
+    "allow_signup": False,
+    "domain": "*"
 }
 
 # search for every file name and load the config from the first file
@@ -55,7 +56,8 @@ for mapping in (
     ("AMBER_DATABASE", "database", lambda val: val), # str -> str
     # pylint: disable=unnecessary-lambda
     ("AMBER_LOGLEVEL", "loglevel", lambda val: int(val)), # str -> int
-    ("AMBER_ALLOW_SIGNUP", "allow_signup", string_to_bool) # str -> bool
+    ("AMBER_ALLOW_SIGNUP", "allow_signup", string_to_bool), # str -> bool
+    ("AMBER_DOMAIN", "domain", lambda val: val) # str -> str
 ):
     env_value = os.getenv(mapping[0])
     if not env_value is None:

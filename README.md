@@ -15,17 +15,20 @@ Example config:
     {
         "database": "sqlite:///file.db", // SQLAlchemy database URI
         // see https://docs.sqlalchemy.org/en/13/core/engines.html#database-urls
-        "allow_signup": false // whether to allow /api/signup or not
-        "loglevel": 0 // 0: errors, 1: warnings, 2: info
+        "allow_signup": false, // whether to allow /api/signup or not
+        "loglevel": 0, // 0: errors, 1: warnings, 2: info
+        "domain": "https://your.domain.tld" // full domain with HTTPS
+        // needed for CORS
     }
 
 If there are environment variables `AMBER_DATABASE` / `AMBER_ALLOW_SIGNUP` /
-`AMBER_LOGLEVEL` set, the program will respect them and use over the values
-provided with the config file.
+`AMBER_LOGLEVEL`, `AMBER_DOMAIN` set, the program will respect them and use
+over the values provided with the config file.
 
 #### Dependencies
 
-This app directly depends on `flask`, `flask-sqlalchemy`, and `bcrypt`.
+This app directly depends on `flask`, `flask-sqlalchemy`, `flask-cors`, and
+`bcrypt`.
 
 #### Licenses
 
