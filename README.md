@@ -30,6 +30,18 @@ over the values provided with the config file.
 This app directly depends on `flask`, `flask-sqlalchemy`, `flask-cors`, and
 `bcrypt`.
 
+#### Running in Docker
+
+The Dockerfile included with the project assumes that:
+
+1. You're going to use either PostgreSQL or SQLite.
+2. You're going to run it behind a reverse proxy such as nginx (and running
+the app without a reverse proxy won't work because of the current uwsgi
+configuration).
+
+If you have to/prefer to use MariaDB, etc, you'll have to add the necessary
+Python packages to the Docker image by hand.
+
 #### Licenses
 
 See [LICENSE.txt](LICENSE.txt).
