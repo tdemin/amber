@@ -38,7 +38,8 @@ def middleware() -> RequestParams:
     if not request.is_json and request.method in ["POST", "PUT", "PATCH"]:
         raise BadRequest
     params = RequestParams()
-    if not request.path in ["/api/login", "/api/signup"]:
+    if not request.path in ["/api/login", "/api/signup"] \
+        and request.method != "OPTIONS":
         params.authenticated = True
     return params
 
