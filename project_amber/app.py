@@ -12,7 +12,7 @@ from project_amber.handlers.session import handle_session_req, \
     handle_session_id_req
 from project_amber.handlers.task import handle_task_id_request, \
     handle_task_request
-from project_amber.handlers.users import signup
+from project_amber.handlers.users import signup, update_user_data
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = config["database"]
@@ -33,6 +33,7 @@ app.add_url_rule("/api/task", "task", handle_task_request, \
     methods=["GET", "POST"])
 app.add_url_rule("/api/task/<task_id>", "task_id", handle_task_id_request, \
     methods=["GET", "PATCH", "DELETE"])
+app.add_url_rule("/api/user", "user", update_user_data, methods=["PATCH"])
 app.add_url_rule("/api/session", "session", handle_session_req, methods=["GET"])
 app.add_url_rule("/api/session/<session_id>", "session_id", \
     handle_session_id_req, methods=["GET", "DELETE"])

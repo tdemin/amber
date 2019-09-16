@@ -6,7 +6,7 @@ from flask import request
 
 from project_amber.const import MSG_USER_NOT_FOUND, MSG_USER_EXISTS
 from project_amber.db import db
-from project_amber.helpers import time
+from project_amber.helpers import time, LoginUser
 from project_amber.errors import Unauthorized, NotFound, Conflict
 from project_amber.logging import log
 from project_amber.models.auth import User, Session
@@ -30,6 +30,21 @@ def addUser(name: str, password: str) -> int:
     user = User(name=name, password=hashed_pw)
     log("Adding user %s..." % name)
     db.session.add(user)
+    db.session.commit()
+    return user.id
+
+def updateUser(**kwargs) -> int:
+    """
+    Updates user data in the database. Returns their ID on success.
+    """
+    user: LoginUser = request.user
+    user_record = db.session.query(User).filter_by(id=user.id).one()
+    for attribute in kwargs:
+        if attribute == "password":
+            user_record.password = hashpw(
+                prehash(kwargs["password"]),
+                gensalt()
+            ).decode()
     db.session.commit()
     return user.id
 
