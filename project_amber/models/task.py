@@ -1,4 +1,6 @@
 from project_amber.db import db
+from project_amber.handlers.const import API_ID, API_TEXT, API_STATUS, \
+    API_LASTMOD, API_PID, API_DEADLINE, API_REMINDER
 
 
 class Task(db.Model):
@@ -31,12 +33,12 @@ class Task(db.Model):
         JSON serialization. Returns the resulting dict.
         """
         result = {
-            "id": self.id,
-            "text": self.text,
-            "status": self.status,
-            "last_mod": self.last_mod_time
+            API_ID: self.id,
+            API_TEXT: self.text,
+            API_STATUS: self.status,
+            API_LASTMOD: self.last_mod_time
         }
-        if self.parent_id: result["parent_id"] = self.parent_id
-        if self.deadline: result["deadline"] = self.deadline
-        if self.reminder: result["reminder"] = self.reminder
+        if self.parent_id: result[API_PID] = self.parent_id
+        if self.deadline: result[API_DEADLINE] = self.deadline
+        if self.reminder: result[API_REMINDER] = self.reminder
         return result

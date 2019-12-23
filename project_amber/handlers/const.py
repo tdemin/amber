@@ -1,8 +1,14 @@
 # API common object fields denotions
+API_ID = "id"
+API_PID = "parent_id"
 API_USER = "username"
 API_PASSWORD = "password"
 API_TOKEN = "token"
-
-API_ID = "id"
 API_LOGIN_TIME = "login_time"
 API_ADDRESS = "address"
+API_LASTMOD = "last_mod"
+API_TEXT = "text"
+API_STATUS = "status"
+API_DEADLINE = "deadline"
+API_REMINDER = "reminder"
+API_QUERY = "query"

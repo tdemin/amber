@@ -15,7 +15,9 @@ def addTask(text: str, status: int, parent_id: int, deadline: int = None, \
     """
     task_time = time()
     gen = 0
-    if not parent_id:
+    if parent_id == 0:
+        parent_id = None
+    if not parent_id is None:
         parent = db.session.query(Task)\
             .filter_by(id=parent_id, owner=request.user.id).one_or_none()
         if parent is None:
