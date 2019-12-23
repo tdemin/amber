@@ -4,6 +4,7 @@ from flask import request
 
 from project_amber.const import MATURE_SESSION, MSG_IMMATURE_SESSION, EMPTY_RESP
 from project_amber.errors import Forbidden
+from project_amber.handlers.const import API_ID, API_LOGIN_TIME, API_ADDRESS
 from project_amber.helpers import time
 from project_amber.helpers.auth import getSessions, getSession, removeSessionById
 from project_amber.logging import log
@@ -14,31 +15,29 @@ def handle_session_req():
     Request handler for `/api/session`. Only accepts GET requests. Returns a
     list of sessions like the one below:
     ```
-    {
-        "sessions": [
-            {
-                "id": 1,
-                "login_time": 123456, // timestamp
-                "address": "127.0.0.1"
-            }
-            {
-                "id": 2,
-                "login_time": 123457,
-                "address": "10.0.0.1"
-            }
-        ]
-    }
+    [
+        {
+            "id": 1,
+            "login_time": 123456, // timestamp
+            "address": "127.0.0.1"
+        }
+        {
+            "id": 2,
+            "login_time": 123457,
+            "address": "10.0.0.1"
+        }
+    ]
     ```
     """
     sessions = getSessions()
     sessionList = []
     for session in sessions:
         sessionList.append({
-            "id": session.id,
-            "login_time": session.login_time,
-            "address": session.address
+            API_ID: session.id,
+            API_LOGIN_TIME: session.login_time,
+            API_ADDRESS: session.address
         })
-    return dumps({"sessions": sessionList})
+    return dumps(sessionList)
 
 
 def handle_session_id_req(session_id: int):
@@ -60,9 +59,9 @@ def handle_session_id_req(session_id: int):
     if request.method == "GET":
         session = getSession(session_id)
         return dumps({
-            "id": session.id,
-            "login_time": session.login_time,
-            "address": session.address
+            API_ID: session.id,
+            API_LOGIN_TIME: session.login_time,
+            API_ADDRESS: session.address
         })
     if request.method == "DELETE":
         if (time() - request.user.login_time) < MATURE_SESSION:
@@ -73,4 +72,4 @@ def handle_session_id_req(session_id: int):
                 request.user.name, session_id
             )
         )
-        return EMPTY_RESP
+    return EMPTY_RESP

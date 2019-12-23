@@ -7,6 +7,7 @@ MATURE_SESSION = DAY_SECONDS * 2  # The difference in times between the login
 # time and the time when a session is considered "mature" (e.g can remove other
 # sessions).
 
+MSG_MISSING_AUTH_INFO = "Missing 'username' or 'password'"
 MSG_NO_TOKEN = "No X-Auth-Token present"
 MSG_INVALID_TOKEN = "Invalid token"
 MSG_USER_NOT_FOUND = "This user does not exist"
