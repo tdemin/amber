@@ -29,21 +29,21 @@ def middleware():
         request.user = user
 
 
-app.add_url_rule("/api/login", "login", login, methods=["POST"])
-app.add_url_rule("/api/logout", "logout", logout, methods=["POST"])
-app.add_url_rule("/api/task", "task", handle_task_request, \
+app.add_url_rule("/v0/login", "login", login, methods=["POST"])
+app.add_url_rule("/v0/logout", "logout", logout, methods=["POST"])
+app.add_url_rule("/v0/task", "task", handle_task_request, \
     methods=["GET", "POST"])
-app.add_url_rule("/api/task/<task_id>", "task_id", handle_task_id_request, \
+app.add_url_rule("/v0/task/<task_id>", "task_id", handle_task_id_request, \
     methods=["GET", "PATCH", "DELETE"])
-app.add_url_rule("/api/user", "user", update_user_data, methods=["PATCH"])
+app.add_url_rule("/v0/user", "user", update_user_data, methods=["PATCH"])
 app.add_url_rule(
-    "/api/session", "session", handle_session_req, methods=["GET"]
+    "/v0/session", "session", handle_session_req, methods=["GET"]
 )
-app.add_url_rule("/api/session/<session_id>", "session_id", \
+app.add_url_rule("/v0/session/<session_id>", "session_id", \
     handle_session_id_req, methods=["GET", "DELETE"])
 
 if config["allow_signup"]:
-    app.add_url_rule("/api/signup", "signup", signup, methods=["POST"])
+    app.add_url_rule("/v0/signup", "signup", signup, methods=["POST"])
 
 
 @app.before_first_request

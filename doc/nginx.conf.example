@@ -3,6 +3,7 @@ server {
     location / { try_files $uri @amber; }
     location @amber {
         include uwsgi_params;
+        rewrite /api/(.*) /$1;
         uwsgi_pass amber:8080;
     }
 }

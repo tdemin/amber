@@ -16,3 +16,6 @@ MSG_IMMATURE_SESSION = "This session is too new, and cannot remove others"
 MSG_TASK_NOT_FOUND = "This task does not exist"
 MSG_TEXT_NOT_SPECIFIED = "No text specified"
 MSG_TASK_DANGEROUS = "Potentially dangerous operation"
+
+# A regex matching all paths that can be accessed without an auth token.
+PUBLIC_PATHS = r"/v\d/(login|signup)"

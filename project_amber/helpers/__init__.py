@@ -1,11 +1,12 @@
 from time import time as time_lib
 from functools import wraps
+from re import fullmatch
 
 from flask import request
 
 from project_amber.db import db
 from project_amber.const import MSG_NO_TOKEN, MSG_INVALID_TOKEN, \
-    MSG_USER_NOT_FOUND, MSG_USER_EXISTS
+    MSG_USER_NOT_FOUND, MSG_USER_EXISTS, PUBLIC_PATHS
 from project_amber.errors import Unauthorized, BadRequest, NotFound, \
     InternalServerError, Conflict
 from project_amber.models.auth import User, Session
@@ -41,7 +42,7 @@ def middleware() -> RequestParams:
     if not request.is_json and request.method in ["POST", "PUT", "PATCH"]:
         raise BadRequest
     params = RequestParams()
-    if not request.path in ["/api/login", "/api/signup"] \
+    if not fullmatch(PUBLIC_PATHS, request.path) \
         and request.method != "OPTIONS":
         params.authenticated = True
     return params
@@ -63,9 +64,7 @@ def handleLogin() -> LoginUser:
     user = db.session.query(User).filter_by(id=user_session.user).one_or_none()
     if user is None:
         raise InternalServerError(MSG_USER_NOT_FOUND)
-    user_details = LoginUser(
-        user.name, user.id, token, user_session.login_time
-    )
+    user_details = LoginUser(user.name, user.id, token, user_session.login_time)
     return user_details
 
 
