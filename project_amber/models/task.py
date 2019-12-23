@@ -1,6 +1,8 @@
 from project_amber.db import db
+from project_amber.errors import BadRequest
 from project_amber.handlers.const import API_ID, API_TEXT, API_STATUS, \
     API_LASTMOD, API_PID, API_DEADLINE, API_REMINDER
+from project_amber.helpers import time
 
 
 class Task(db.Model):
@@ -11,6 +13,7 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     owner = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     text = db.Column(db.String(65536))
+    # TODO: get rid of this legacy altogether
     gen = db.Column(db.Integer, nullable=False)
     parent_id = db.Column(db.Integer, db.ForeignKey("task.id"))
     status = db.Column(db.Integer, nullable=False)
@@ -19,7 +22,7 @@ class Task(db.Model):
     deadline = db.Column(db.Integer)
     reminder = db.Column(db.Integer)
 
-    def is_child(self) -> bool:
+    def isChild(self) -> bool:
         """
         Helper method. Simply checks whether the task is of gen 0 or not.
         """
@@ -42,3 +45,37 @@ class Task(db.Model):
         if self.deadline: result[API_DEADLINE] = self.deadline
         if self.reminder: result[API_REMINDER] = self.reminder
         return result
+
+    def merge(self, task: "Task"):
+        """
+        Copies public data from another task.
+
+        Does not update task generations; this has to be done manually.
+        """
+        for i in ("parent_id", "text", "status", "reminder", "deadline"):
+            new_value = getattr(task, i)
+            if new_value is not None:
+                setattr(self, i, new_value)
+
+    def __init__(self, owner: int, data: dict = None):
+        if not isinstance(data, dict): raise BadRequest
+        self.text = data.get(API_TEXT)
+        self.status = data.get(API_STATUS)
+        self.creation_time = time()
+        self.last_mod_time = self.creation_time
+        self.parent_id = data.get(API_PID)
+        self.deadline = data.get(API_DEADLINE)
+        self.reminder = data.get(API_REMINDER)
+        self.owner = owner
+
+    def add(self):
+        """
+        Adds the task to the database. Wraps SQLAlchemy's `db.session.add()`
+        """
+        db.session.add(self)
+
+    def delete(self):
+        """
+        Removes the task from the database. Wraps SQLAlchemy's `db.session.delete()`
+        """
+        db.session.delete(self)

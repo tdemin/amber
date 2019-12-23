@@ -2,10 +2,8 @@ from json import dumps
 
 from flask import request
 
-from project_amber.const import EMPTY_RESP, MSG_TEXT_NOT_SPECIFIED
-from project_amber.errors import BadRequest
-from project_amber.handlers.const import API_PID, API_TEXT, API_STATUS, \
-    API_DEADLINE, API_REMINDER, API_QUERY
+from project_amber.const import EMPTY_RESP
+from project_amber.handlers.const import API_QUERY
 from project_amber.helpers.task import addTask, getTask, getTasks, \
     updateTask, removeTask
 
@@ -54,16 +52,9 @@ def handle_task_request():
             tasksList.append(task.toDict())
         return dumps(tasksList)
     if request.method == "POST":
-        text = request.json.get(API_TEXT)
-        if text is None: raise BadRequest(MSG_TEXT_NOT_SPECIFIED)
-        status = request.json.get(API_STATUS)
-        # if only I could `get("status", d=0)` like we do that with dicts
-        if status is None: status = 0
-        deadline = request.json.get(API_DEADLINE)
-        reminder = request.json.get(API_REMINDER)
-        parent_id = request.json.get(API_PID)  # ok to be `None`
-        new_id = addTask(text, status, parent_id, deadline, reminder)
+        new_id = addTask(request.json)
         return dumps(new_id)
+    return EMPTY_RESP
 
 
 def handle_task_id_request(task_id: int):
@@ -99,15 +90,7 @@ def handle_task_id_request(task_id: int):
         response = task.toDict()
         return dumps(response)
     if request.method == "PATCH":
-        text = request.json.get(API_TEXT)
-        status = request.json.get(API_STATUS)
-        parent_id = request.json.get(API_PID)
-        deadline = request.json.get(API_DEADLINE)
-        reminder = request.json.get(API_REMINDER)
-        # these are fine to be `None`
-        updateTask(task_id, text=text, status=status, parent_id=parent_id, \
-            deadline=deadline, reminder=reminder)
-        return EMPTY_RESP
+        updateTask(task_id, request.json)
     if request.method == "DELETE":
         removeTask(task_id)
-        return EMPTY_RESP
+    return EMPTY_RESP
