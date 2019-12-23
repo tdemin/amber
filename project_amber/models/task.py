@@ -21,8 +21,7 @@ class Task(db.Model):
         """
         Helper method. Simply checks whether the task is of gen 0 or not.
         """
-        if self.gen > 0:
-            return True
+        if self.gen > 0: return True
         return False
 
     def toDict(self) -> dict:

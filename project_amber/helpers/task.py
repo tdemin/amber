@@ -15,10 +15,7 @@ def addTask(text: str, status: int, parent_id: int, deadline: int = None, \
     """
     task_time = time()
     gen = 0
-    # FIXME: dirty, and is really supposed to be fixed at another level
-    if parent_id == 0:
-        parent_id = None
-    if not parent_id is None:
+    if not parent_id:
         parent = db.session.query(Task)\
             .filter_by(id=parent_id, owner=request.user.id).one_or_none()
         if parent is None:
@@ -39,8 +36,7 @@ def getTask(task_id: int) -> Task:
     """
     task_query = db.session.query(Task).filter_by(id=task_id)
     task = task_query.filter_by(owner=request.user.id).one_or_none()
-    if task is None:
-        raise NotFound(MSG_TASK_NOT_FOUND)
+    if task is None: raise NotFound(MSG_TASK_NOT_FOUND)
     return task
 
 
@@ -62,7 +58,7 @@ def updateChildren(task_id: int):
     expensive recursive operation.
     """
     task = getTask(task_id)
-    if not task.parent_id is None:
+    if task.parent_id:
         parent = getTask(task.parent_id)
         task.gen = parent.gen + 1
     else:

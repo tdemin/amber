@@ -22,11 +22,7 @@ CORS(app, resources={r"/*": {"origins": config["domain"]}})
 
 @app.before_request
 def middleware():
-    params = checkRequest()
-    if params.authenticated:
-        user = handleLogin()
-        # add a global variable that every function will use from now on
-        request.user = user
+    if checkRequest().authenticated: request.user = handleLogin()
 
 
 app.add_url_rule("/v0/login", "login", login, methods=["POST"])
