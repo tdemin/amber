@@ -31,6 +31,7 @@ def addTask(text: str, status: int, parent_id: int, deadline: int = None, \
     db.session.commit()
     return task.id
 
+
 def getTask(task_id: int) -> Task:
     """
     Returns an instance of `Task`, given the ID. Only returns tasks to
@@ -42,6 +43,7 @@ def getTask(task_id: int) -> Task:
         raise NotFound(MSG_TASK_NOT_FOUND)
     return task
 
+
 def getTasks(text: str = None) -> List[Task]:
     """
     Returns a list containing tasks from a certain user. If the second
@@ -52,6 +54,7 @@ def getTasks(text: str = None) -> List[Task]:
     if text is None:
         return req.all()
     return req.filter(Task.text.ilike("%{0}%".format(text))).all()
+
 
 def updateChildren(task_id: int):
     """
@@ -67,6 +70,7 @@ def updateChildren(task_id: int):
     children = db.session.query(Task).filter_by(parent_id=task_id).all()
     for child in children:
         updateChildren(child.id)
+
 
 def updateTask(task_id: int, **kwargs) -> int:
     """
@@ -97,6 +101,7 @@ def updateTask(task_id: int, **kwargs) -> int:
     task.last_mod_time = time()
     db.session.commit()
     return task_id
+
 
 def removeTask(task_id: int) -> int:
     """

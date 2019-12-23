@@ -4,6 +4,7 @@ from project_amber.const import EMPTY_RESP
 from project_amber.errors import BadRequest
 from project_amber.helpers.auth import addUser, updateUser
 
+
 def update_user_data():
     """
     User data PATCH request handler. Accepts JSON with these parameters:
@@ -17,6 +18,7 @@ def update_user_data():
     if "password" in request.json:
         updateUser(password=request.json.get("password"))
     return EMPTY_RESP
+
 
 def signup():
     """

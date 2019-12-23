@@ -7,6 +7,7 @@ from project_amber.errors import BadRequest
 from project_amber.helpers.auth import removeSession, createSession
 from project_amber.logging import log
 
+
 def login():
     """
     Login handler. Accepts this JSON:
@@ -27,7 +28,8 @@ def login():
     if not "name" in request.json or not "password" in request.json:
         raise BadRequest
     token = createSession(request.json["name"], request.json["password"])
-    return dumps({ "token": token })
+    return dumps({"token": token})
+
 
 def logout():
     """

@@ -10,6 +10,7 @@ from project_amber.errors import Unauthorized, BadRequest, NotFound, \
     InternalServerError, Conflict
 from project_amber.models.auth import User, Session
 
+
 class LoginUser:
     """
     Representational class for request checks. Contains the user name
@@ -22,12 +23,14 @@ class LoginUser:
         self.token = token
         self.login_time = login_time
 
+
 class RequestParams:
     """
     Representational class for request parameters.
     """
     def __init__(self):
         self.authenticated = False
+
 
 def middleware() -> RequestParams:
     """
@@ -43,6 +46,7 @@ def middleware() -> RequestParams:
         params.authenticated = True
     return params
 
+
 def handleLogin() -> LoginUser:
     """
     Login handler. Works with Flask's `request`. Returns an object
@@ -52,14 +56,18 @@ def handleLogin() -> LoginUser:
     token = request.headers.get("X-Auth-Token")
     if token is None:
         raise Unauthorized(MSG_NO_TOKEN)
-    user_session = db.session.query(Session).filter_by(token=token).one_or_none()
+    user_session = db.session.query(Session).filter_by(token=token
+                                                       ).one_or_none()
     if user_session is None:
         raise Unauthorized(MSG_INVALID_TOKEN)
     user = db.session.query(User).filter_by(id=user_session.user).one_or_none()
     if user is None:
         raise InternalServerError(MSG_USER_NOT_FOUND)
-    user_details = LoginUser(user.name, user.id, token, user_session.login_time)
+    user_details = LoginUser(
+        user.name, user.id, token, user_session.login_time
+    )
     return user_details
+
 
 def time() -> int:
     """

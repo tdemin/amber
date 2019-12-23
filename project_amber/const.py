@@ -1,9 +1,9 @@
 from json import dumps
 
-EMPTY_RESP = dumps({}) # Empty response, to be used in requests.
+EMPTY_RESP = dumps({})  # Empty response, to be used in requests.
 
 DAY_SECONDS = 60 * 60 * 24
-MATURE_SESSION = DAY_SECONDS * 2 # The difference in times between the login
+MATURE_SESSION = DAY_SECONDS * 2  # The difference in times between the login
 # time and the time when a session is considered "mature" (e.g can remove other
 # sessions).
 

@@ -1,5 +1,6 @@
 from project_amber.db import db
 
+
 class Task(db.Model):
     """
     Task model. Contains a task ID, the owner, the subject, and the lastmod /
@@ -15,6 +16,7 @@ class Task(db.Model):
     last_mod_time = db.Column(db.Integer, nullable=False)
     deadline = db.Column(db.Integer)
     reminder = db.Column(db.Integer)
+
     def is_child(self) -> bool:
         """
         Helper method. Simply checks whether the task is of gen 0 or not.
@@ -22,6 +24,7 @@ class Task(db.Model):
         if self.gen > 0:
             return True
         return False
+
     def toDict(self) -> dict:
         """
         Helper method that converts public task data (ID, text, PID, status,

@@ -7,6 +7,7 @@ from project_amber.errors import BadRequest
 from project_amber.helpers.task import addTask, getTask, getTasks, \
     updateTask, removeTask
 
+
 def handle_task_request():
     """
     Handles requests to `/api/task`. Accepts GET and POST.
@@ -52,10 +53,7 @@ def handle_task_request():
         for task in tasks:
             tasksList.append(task.toDict())
             if task.last_mod_time > lastMod: lastMod = task.last_mod_time
-        return dumps({
-            "last_mod": lastMod,
-            "tasks": tasksList
-        })
+        return dumps({"last_mod": lastMod, "tasks": tasksList})
     if request.method == "POST":
         text = request.json.get("text")
         if text is None: raise BadRequest(MSG_TEXT_NOT_SPECIFIED)
@@ -64,9 +62,10 @@ def handle_task_request():
         if status is None: status = 0
         deadline = request.json.get("deadline")
         reminder = request.json.get("reminder")
-        parent_id = request.json.get("parent_id") # ok to be `None`
+        parent_id = request.json.get("parent_id")  # ok to be `None`
         new_id = addTask(text, status, parent_id, deadline, reminder)
-        return dumps({ "id": new_id })
+        return dumps({"id": new_id})
+
 
 def handle_task_id_request(task_id: int):
     """
