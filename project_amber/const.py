@@ -19,4 +19,6 @@ MSG_TEXT_NOT_SPECIFIED = "No text specified"
 MSG_TASK_DANGEROUS = "Potentially dangerous operation"
 
 # A regex matching all paths that can be accessed without an auth token.
-PUBLIC_PATHS = r"/v\d/(login|signup)"
+PUBLIC_PATHS = r"/v\d/(login|signup|version)"
+
+VERSION = "0.0.1"
