@@ -4,10 +4,11 @@ from base64 import b64encode
 from bcrypt import hashpw, gensalt, checkpw
 from flask import request
 
-from project_amber.const import MSG_USER_NOT_FOUND, MSG_USER_EXISTS
+from project_amber.const import MSG_USER_NOT_FOUND, MSG_USER_EXISTS, \
+    MSG_MISSING_AUTH_INFO
 from project_amber.db import db
 from project_amber.helpers import time, LoginUser
-from project_amber.errors import Unauthorized, NotFound, Conflict
+from project_amber.errors import Unauthorized, NotFound, Conflict, BadRequest
 from project_amber.logging import log
 from project_amber.models.auth import User, Session
 
@@ -24,6 +25,8 @@ def addUser(name: str, password: str) -> int:
     """
     Creates a new user. Returns their ID on success.
     """
+    if not name or not password:
+        raise BadRequest(MSG_MISSING_AUTH_INFO)
     # does a user with this name already exist?
     if not db.session.query(User).filter_by(name=name).one_or_none() is None:
         raise Conflict(MSG_USER_EXISTS)
@@ -118,9 +121,9 @@ def removeSessionById(session_id: int) -> int:
     """
     Removes a user session by session ID. Returns the session ID on success.
     """
-    session = db.session.query(Session).filter_by(
-        id=session_id, user=request.user.id
-    ).one_or_none()
+    session = db.session.query(Session
+                               ).filter_by(id=session_id,
+                                           user=request.user.id).one_or_none()
     if session is None:
         raise NotFound
     db.session.delete(session)
@@ -140,9 +143,9 @@ def getSession(session_id: int) -> Session:
     """
     Returns a single `Session` by its ID.
     """
-    session = db.session.query(Session).filter_by(
-        id=session_id, user=request.user.id
-    ).one_or_none()
+    session = db.session.query(Session
+                               ).filter_by(id=session_id,
+                                           user=request.user.id).one_or_none()
     if session is None:
         raise NotFound
     return session
