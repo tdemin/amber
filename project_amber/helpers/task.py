@@ -17,18 +17,16 @@ def addTask(data: dict) -> int:
     task = Task(request.user.id, data)
     if task.text is None: raise BadRequest(MSG_TEXT_NOT_SPECIFIED)
     if task.status is None: task.status = 0
-    gen = 0
     parent_id = task.parent_id
-    if parent_id == 0:
-        parent_id = None
-    if not parent_id is None:
+    if parent_id:
         parent = db.session.query(Task)\
             .filter_by(id=parent_id, owner=request.user.id).one_or_none()
         if parent is None:
             raise NotFound(MSG_TASK_NOT_FOUND)
-        gen = parent.gen + 1
-    task.gen = gen
     task.add()
+    db.session.commit()
+    updateChildren(task.id)
+    # TODO: can we remove the second commit here?
     db.session.commit()
     return task.id
 
@@ -38,8 +36,8 @@ def getTask(task_id: int) -> Task:
     Returns an instance of `Task`, given the ID. Only returns tasks to
     their owner.
     """
-    task_query = db.session.query(Task).filter_by(id=task_id)
-    task = task_query.filter_by(owner=request.user.id).one_or_none()
+    task = db.session.query(Task).filter_by(id=task_id,
+                                            owner=request.user.id).one_or_none()
     if task is None: raise NotFound(MSG_TASK_NOT_FOUND)
     return task
 
@@ -58,15 +56,17 @@ def getTasks(text: str = None) -> List[Task]:
 
 def updateChildren(task_id: int):
     """
-    Updates generations for the children nodes of a task subtree. This is a very
-    expensive recursive operation.
+    Updates children lists for the children nodes of a task subtree. This is
+    an expensive recursive operation.
     """
     task = getTask(task_id)
     if task.parent_id:
         parent = getTask(task.parent_id)
-        task.gen = parent.gen + 1
+        parent_list = parent.getParents()
+        parent_list.append(parent.id)
+        task.setParents(parent_list)
     else:
-        task.gen = 0
+        task.setParents(list())
     children = db.session.query(Task).filter_by(parent_id=task_id).all()
     for child in children:
         updateChildren(child.id)
@@ -85,10 +85,8 @@ def updateTask(task_id: int, data: dict) -> int:
             task.parent_id = None
             updateChildren(task.id)
         else:
-            # TODO: we limit changing parent IDs to prevent circular deps,
-            # can this be done better?
             new_parent = getTask(new_details.parent_id)
-            if new_parent.gen > task.gen and task.isChild():
+            if task.id in new_parent.getParents() or task.id == new_parent.id:
                 raise BadRequest(MSG_TASK_DANGEROUS)
             task.parent_id = new_parent.id
             updateChildren(task.id)
