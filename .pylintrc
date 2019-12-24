@@ -17,6 +17,7 @@ disable=
     missing-docstring,
     protected-access,
     too-few-public-methods,
+    unnecessary-lambda
     # handled by black
     format
 
