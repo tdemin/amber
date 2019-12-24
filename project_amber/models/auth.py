@@ -1,5 +1,6 @@
 from project_amber.db import db
 
+
 class User(db.Model):
     """
     Holds the usual user details (username, password). The password is
@@ -8,8 +9,10 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), unique=True, nullable=False)
     password = db.Column(db.String(256))
+
     def __repr__(self):
         return "<User id='%d' name='%s'>" % self.id, self.name
+
 
 class Session(db.Model):
     """
@@ -20,6 +23,7 @@ class Session(db.Model):
     user = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     login_time = db.Column(db.Integer, nullable=False)
     address = db.Column(db.String(100), nullable=False)
+
     def __repr__(self):
         return "<Session token='%s' user='%d' login_time='%d' ip='%s'>" % \
             self.token, self.user, self.login_time, self.address

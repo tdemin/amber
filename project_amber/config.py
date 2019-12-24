@@ -6,12 +6,7 @@ if os.name == "posix":
 else:
     configPaths = ["config.json"]
 
-config = {
-    "database": "",
-    "loglevel": 0,
-    "allow_signup": False,
-    "domain": "*"
-}
+config = {"database": "", "loglevel": 0, "allow_signup": False, "domain": "*"}
 
 # search for every file name and load the config from the first file
 # that exists
@@ -38,6 +33,7 @@ for entry in config:
     if entry in loadedConfig:
         config[entry] = loadedConfig[entry]
 
+
 def string_to_bool(val: str) -> bool:
     """
     Converts a string containing a bool value to Python's bool. Serves as a
@@ -49,15 +45,16 @@ def string_to_bool(val: str) -> bool:
         return False
     return False
 
+
 # override config with environment variables in need, the first element of a
 # tuple is the environment variable itself, the second is the corresponding
 # `config` key, and the third one is the function to convert the possible values
 for mapping in (
-    ("AMBER_DATABASE", "database", lambda val: val), # str -> str
+    ("AMBER_DATABASE", "database", lambda val: val),  # str -> str
     # pylint: disable=unnecessary-lambda
-    ("AMBER_LOGLEVEL", "loglevel", lambda val: int(val)), # str -> int
-    ("AMBER_ALLOW_SIGNUP", "allow_signup", string_to_bool), # str -> bool
-    ("AMBER_DOMAIN", "domain", lambda val: val) # str -> str
+    ("AMBER_LOGLEVEL", "loglevel", lambda val: int(val)),  # str -> int
+    ("AMBER_ALLOW_SIGNUP", "allow_signup", string_to_bool),  # str -> bool
+    ("AMBER_DOMAIN", "domain", lambda val: val)  # str -> str
 ):
     env_value = os.getenv(mapping[0])
     if not env_value is None:

@@ -2,10 +2,11 @@ from json import dumps
 
 from flask import request
 
-from project_amber.const import EMPTY_RESP, MSG_TEXT_NOT_SPECIFIED
-from project_amber.errors import BadRequest
+from project_amber.const import EMPTY_RESP
+from project_amber.handlers.const import API_QUERY
 from project_amber.helpers.task import addTask, getTask, getTasks, \
     updateTask, removeTask
+
 
 def handle_task_request():
     """
@@ -14,59 +15,47 @@ def handle_task_request():
     case only the tasks which text contains things from `query` will be sent.
     With a GET request, this will be returned to an authenticated user:
     ```
-    {
-        "last_mod": 12346, // the latest last_mod from task list
-        "tasks": [
-            {
-                "id": 123,
-                "text": "Some task",
-                "status:": 1,
-                "last_mod": 12345, // timestamp
-                "deadline": 123456
-            },
-            {
-                "id": 456,
-                "text": "Some text",
-                "status": 0,
-                "last_mod": 12346,
-                "parent_id": 123,
-                "reminder": 123457
-            }
-        ]
-    }
+    [
+        {
+            "id": 123,
+            "text": "Some task",
+            "status:": 1,
+            "last_mod": 12345, // timestamp
+            "deadline": 123456
+        },
+        {
+            "id": 456,
+            "text": "Some text",
+            "status": 0,
+            "last_mod": 12346,
+            "parent_id": 123,
+            "reminder": 123457
+        }
+    ]
     ```
     With a POST request, the client will get HTTP 200 on this body:
     ```
     {
-        "text": "Some task"
+        "text": "Some task",
+        "status": 0,
+        ...
     }
     ```
-    with a task ID.
+    with a task ID (a literal integer value like `35213`).
     """
     if request.method == "GET":
-        query = request.args.get("query", None)
+        query = request.args.get(API_QUERY, None)
         # `query` is OK to be `None`
         tasks = getTasks(query)
         tasksList = []
-        lastMod = 0
         for task in tasks:
             tasksList.append(task.toDict())
-            if task.last_mod_time > lastMod: lastMod = task.last_mod_time
-        return dumps({
-            "last_mod": lastMod,
-            "tasks": tasksList
-        })
+        return dumps(tasksList)
     if request.method == "POST":
-        text = request.json.get("text")
-        if text is None: raise BadRequest(MSG_TEXT_NOT_SPECIFIED)
-        status = request.json.get("status")
-        # if only I could `get("status", d=0)` like we do that with dicts
-        if status is None: status = 0
-        deadline = request.json.get("deadline")
-        reminder = request.json.get("reminder")
-        parent_id = request.json.get("parent_id") # ok to be `None`
-        new_id = addTask(text, status, parent_id, deadline, reminder)
-        return dumps({ "id": new_id })
+        new_id = addTask(request.json)
+        return dumps(new_id)
+    return EMPTY_RESP
+
 
 def handle_task_id_request(task_id: int):
     """
@@ -101,15 +90,7 @@ def handle_task_id_request(task_id: int):
         response = task.toDict()
         return dumps(response)
     if request.method == "PATCH":
-        text = request.json.get("text")
-        status = request.json.get("status")
-        parent_id = request.json.get("parent_id")
-        deadline = request.json.get("deadline")
-        reminder = request.json.get("reminder")
-        # these are fine to be `None`
-        updateTask(task_id, text=text, status=status, parent_id=parent_id, \
-            deadline=deadline, reminder=reminder)
-        return EMPTY_RESP
+        updateTask(task_id, request.json)
     if request.method == "DELETE":
-        removeTask(task_id)
-        return EMPTY_RESP
+        return dumps(removeTask(task_id))
+    return EMPTY_RESP

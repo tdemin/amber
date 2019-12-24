@@ -9,6 +9,7 @@ if config["loglevel"] == 1: level = logging.WARN
 logging.basicConfig(level=level)
 logger = logging.getLogger("amber_backend")
 
+
 def log(message):
     """
     Wrapper for the logger calls. Only intended to be used in DB code.
@@ -16,11 +17,13 @@ def log(message):
     """
     logger.info(message)
 
+
 def warn(message):
     """
     Wrapper for the logger calls. Corresponds to loglevel 1.
     """
     logger.warning(message)
+
 
 def error(message):
     """

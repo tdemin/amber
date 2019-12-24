@@ -3,6 +3,7 @@
 
 # VSCode settings
 .vscode
+.devcontainer
 
 # App settings
 config.json
