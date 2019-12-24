@@ -95,15 +95,17 @@ def updateTask(task_id: int, data: dict) -> int:
     return task_id
 
 
-def removeTask(task_id: int) -> int:
+def removeTask(task_id: int) -> List[int]:
     """
-    Removes a task. Returns its ID on success. Removes all children as well. Is
-    recursive, and so is expensive.
+    Removes a task, recursively removing its subtasks. Returns the list of
+    removed task IDs.
     """
+    removed = list()
     children = db.session.query(Task).filter_by(parent_id=task_id).all()
     for child in children:
-        removeTask(child.id)
+        removed.extend(removeTask(child.id))
     task = getTask(task_id)
     task.delete()
     db.session.commit()
-    return task_id
+    removed.append(task.id)
+    return removed

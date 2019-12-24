@@ -92,5 +92,5 @@ def handle_task_id_request(task_id: int):
     if request.method == "PATCH":
         updateTask(task_id, request.json)
     if request.method == "DELETE":
-        removeTask(task_id)
+        return dumps(removeTask(task_id))
     return EMPTY_RESP
