@@ -67,6 +67,9 @@ class Task(db.Model):
         self.creation_time = time()
         self.last_mod_time = self.creation_time
         self.parent_id = data.get(API_PID)
+        # SQLite is fine with 0 in foreign key, Postgres isn't,
+        # and this needs a workaround
+        if self.parent_id == 0: self.parent_id = None
         self.deadline = data.get(API_DEADLINE)
         self.reminder = data.get(API_REMINDER)
         self.parents = ""
