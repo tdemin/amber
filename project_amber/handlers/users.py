@@ -8,9 +8,6 @@ from project_amber.helpers.auth import addUser, updateUser
 
 user_handlers = Blueprint("user_handlers", __name__)
 
-signup_allowed = False
-if config["allow_signup"]: signup_allowed = True
-
 
 @user_handlers.route("/user", methods=["PATCH"])
 def user_data():
@@ -41,7 +38,7 @@ def signup():
     Returns HTTP 200 with empty JSON on success, 400 on missing params, 403 if
     the method is disabled by a config parameter.
     """
-    if not signup_allowed:
+    if not config.allow_signup:
         raise Forbidden(MSG_SIGNUP_FORBIDDEN)
     if not API_USER in request.json or not API_PASSWORD in request.json:
         raise BadRequest(MSG_MISSING_AUTH_INFO)

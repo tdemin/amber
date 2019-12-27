@@ -15,14 +15,15 @@ from project_amber.handlers.task import task_handlers as task
 from project_amber.handlers.users import user_handlers as user
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = config["database"]
+app.config["SQLALCHEMY_DATABASE_URI"] = config.database
 db.init_app(app)
-CORS(app, resources={r"/*": {"origins": config["domain"]}})
+CORS(app, resources={r"/*": {"origins": config.domain}})
 
 
 @app.before_request
 def middleware():
-    if check_request().authenticated: request.user = handleLogin()
+    if check_request().authenticated:
+        request.user = handleLogin()
 
 
 for blueprint in (auth, session, misc, task, user):

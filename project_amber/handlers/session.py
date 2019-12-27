@@ -13,7 +13,7 @@ session_handlers = Blueprint("session_handlers", __name__)
 
 
 @session_handlers.route("/session", methods=["GET"])
-def session():
+def get_sessions():
     """
     Request handler for `/api/session`. Only accepts GET requests. Returns a
     list of sessions like the one below:
