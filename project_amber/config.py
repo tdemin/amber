@@ -1,15 +1,20 @@
 import os
+import sys
 from json import load
 
+class Config:
+    database: str = ""
+    loglevel: int = 0
+    allow_signup: bool = False
+    domain: str = "*"
+
+config = Config()
+
+configPaths = ["config.json"]
 if os.name == "posix":
-    configPaths = ["./config.json", "/etc/amber.json"]
-else:
-    configPaths = ["config.json"]
+    configPaths.append("/etc/amber.json")
 
-config = {"database": "", "loglevel": 0, "allow_signup": False, "domain": "*"}
-
-# search for every file name and load the config from the first file
-# that exists
+# search for every file name and load the config from the first file that exists
 for testedFileName in configPaths:
     if os.path.isfile(testedFileName):
         # holds the actual config file name
@@ -17,7 +22,7 @@ for testedFileName in configPaths:
         break
 if not "configFileName" in globals():
     print("No configuration file found, exiting")
-    exit(1)
+    sys.exit(1)
 
 try:
     with open(configFileName, encoding="utf8") as configFile:
@@ -27,11 +32,11 @@ try:
 except OSError as ioerr:
     print("Could not open config file", configFileName)
     print(ioerr.strerror)
-    exit(1)
+    sys.exit(1)
 
-for entry in config:
+for entry in vars(config):
     if entry in loadedConfig:
-        config[entry] = loadedConfig[entry]
+        setattr(config, entry, loadedConfig[entry])
 
 
 def string_to_bool(val: str) -> bool:
@@ -50,16 +55,16 @@ def string_to_bool(val: str) -> bool:
 # tuple is the environment variable itself, the second is the corresponding
 # `config` key, and the third one is the function to convert the possible values
 for mapping in (
-    ("AMBER_DATABASE", "database", lambda val: val),  # str -> str
-    # pylint: disable=unnecessary-lambda
-    ("AMBER_LOGLEVEL", "loglevel", lambda val: int(val)),  # str -> int
-    ("AMBER_ALLOW_SIGNUP", "allow_signup", string_to_bool),  # str -> bool
-    ("AMBER_DOMAIN", "domain", lambda val: val)  # str -> str
+        ("AMBER_DATABASE", "database", lambda val: val),  # str -> str
+        # pylint: disable=unnecessary-lambda
+        ("AMBER_LOGLEVEL", "loglevel", lambda val: int(val)),  # str -> int
+        ("AMBER_ALLOW_SIGNUP", "allow_signup", string_to_bool),  # str -> bool
+        ("AMBER_DOMAIN", "domain", lambda val: val)  # str -> str
 ):
     env_value = os.getenv(mapping[0])
     if not env_value is None:
-        config[mapping[1]] = mapping[2](env_value)
+        setattr(config, mapping[1], mapping[2](env_value))
 
-if config["database"] == "":
+if not config.database:
     print("No database specified. Exiting.")
-    exit(1)
+    sys.exit(1)

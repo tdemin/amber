@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name="project_amber",
-    version="0.0.2.1",
+    version="0.0.3",
     description="The backend app of a note-taking app, Project Amber",
     url="https://git.tdem.in/tdemin/amber",
     author="Timur Demin",

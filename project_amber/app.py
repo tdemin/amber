@@ -6,43 +6,28 @@ from flask_cors import CORS
 from project_amber.config import config
 from project_amber.db import db
 from project_amber.errors import HTTPError
-from project_amber.helpers import handleLogin, middleware as checkRequest
-from project_amber.handlers.auth import login, logout
-from project_amber.handlers.session import handle_session_req, \
-    handle_session_id_req
-from project_amber.handlers.misc import version as handle_version_request
-from project_amber.handlers.task import handle_task_id_request, \
-    handle_task_request
-from project_amber.handlers.users import signup, update_user_data
+from project_amber.helpers import handleLogin, middleware as check_request
+from project_amber.handlers.const import API_V0
+from project_amber.handlers.auth import auth_handlers as auth
+from project_amber.handlers.session import session_handlers as session
+from project_amber.handlers.misc import misc_handlers as misc
+from project_amber.handlers.task import task_handlers as task
+from project_amber.handlers.users import user_handlers as user
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = config["database"]
+app.config["SQLALCHEMY_DATABASE_URI"] = config.database
 db.init_app(app)
-CORS(app, resources={r"/*": {"origins": config["domain"]}})
+CORS(app, resources={r"/*": {"origins": config.domain}})
 
 
 @app.before_request
 def middleware():
-    if checkRequest().authenticated: request.user = handleLogin()
+    if check_request().authenticated:
+        request.user = handleLogin()
 
 
-app.add_url_rule("/v0/login", "login", login, methods=["POST"])
-app.add_url_rule("/v0/logout", "logout", logout, methods=["POST"])
-app.add_url_rule("/v0/task", "task", handle_task_request, \
-    methods=["GET", "POST"])
-app.add_url_rule("/v0/task/<task_id>", "task_id", handle_task_id_request, \
-    methods=["GET", "PATCH", "DELETE"])
-app.add_url_rule("/v0/user", "user", update_user_data, methods=["PATCH"])
-app.add_url_rule(
-    "/v0/session", "session", handle_session_req, methods=["GET"]
-)
-app.add_url_rule("/v0/session/<session_id>", "session_id", \
-    handle_session_id_req, methods=["GET", "DELETE"])
-app.add_url_rule("/v0/version", "version", handle_version_request, \
-    methods=["GET"])
-
-if config["allow_signup"]:
-    app.add_url_rule("/v0/signup", "signup", signup, methods=["POST"])
+for blueprint in (auth, session, misc, task, user):
+    app.register_blueprint(blueprint, url_prefix=API_V0)
 
 
 @app.before_first_request

@@ -3,8 +3,10 @@ import logging
 from project_amber.config import config
 
 level = logging.INFO
-if config["loglevel"] == 0: level = logging.ERROR
-if config["loglevel"] == 1: level = logging.WARN
+if config.loglevel == 0:
+    level = logging.ERROR
+if config.loglevel == 1:
+    level = logging.WARN
 
 logging.basicConfig(level=level)
 logger = logging.getLogger("amber_backend")
