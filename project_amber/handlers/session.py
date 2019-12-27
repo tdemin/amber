@@ -1,6 +1,6 @@
 from json import dumps
 
-from flask import request
+from flask import request, Blueprint
 
 from project_amber.const import MATURE_SESSION, MSG_IMMATURE_SESSION, EMPTY_RESP
 from project_amber.errors import Forbidden
@@ -9,8 +9,11 @@ from project_amber.helpers import time
 from project_amber.helpers.auth import getSessions, getSession, removeSessionById
 from project_amber.logging import log
 
+session_handlers = Blueprint("session_handlers", __name__)
 
-def handle_session_req():
+
+@session_handlers.route("/session", methods=["GET"])
+def session():
     """
     Request handler for `/api/session`. Only accepts GET requests. Returns a
     list of sessions like the one below:
@@ -40,7 +43,8 @@ def handle_session_req():
     return dumps(sessionList)
 
 
-def handle_session_id_req(session_id: int):
+@session_handlers.route("/session/<session_id>", methods=["GET", "DELETE"])
+def session_by_id(session_id: int):
     """
     Login handler for `/api/session/<id>`. Accepts GET and DELETE
     requests. Returns 404 if this session does not exist. On successful

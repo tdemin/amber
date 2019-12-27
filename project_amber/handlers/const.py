@@ -14,3 +14,5 @@ API_REMINDER = "reminder"
 API_QUERY = "query"
 API_VERSION = "version"
 API_SIGNUP = "signup"
+
+API_V0 = "/v0"

@@ -1,12 +1,19 @@
-from flask import request
+from flask import request, Blueprint
 
-from project_amber.const import EMPTY_RESP, MSG_MISSING_AUTH_INFO
-from project_amber.errors import BadRequest
+from project_amber.config import config
+from project_amber.const import EMPTY_RESP, MSG_MISSING_AUTH_INFO, MSG_SIGNUP_FORBIDDEN
+from project_amber.errors import BadRequest, Forbidden
 from project_amber.handlers.const import API_PASSWORD, API_USER
 from project_amber.helpers.auth import addUser, updateUser
 
+user_handlers = Blueprint("user_handlers", __name__)
 
-def update_user_data():
+signup_allowed = False
+if config["allow_signup"]: signup_allowed = True
+
+
+@user_handlers.route("/user", methods=["PATCH"])
+def user_data():
     """
     User data PATCH request handler. Accepts JSON with these parameters:
     ```
@@ -21,6 +28,7 @@ def update_user_data():
     return EMPTY_RESP
 
 
+@user_handlers.route("/signup", methods=["POST"])
 def signup():
     """
     Signup request handler. Accepts this JSON:
@@ -30,9 +38,11 @@ def signup():
         "password": "some_password"
     }
     ```
-    Returns HTTP 200 with empty JSON on success, 400 on missing params, 500
-    otherwise.
+    Returns HTTP 200 with empty JSON on success, 400 on missing params, 403 if
+    the method is disabled by a config parameter.
     """
+    if not signup_allowed:
+        raise Forbidden(MSG_SIGNUP_FORBIDDEN)
     if not API_USER in request.json or not API_PASSWORD in request.json:
         raise BadRequest(MSG_MISSING_AUTH_INFO)
     addUser(request.json[API_USER], request.json[API_PASSWORD])
