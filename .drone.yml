@@ -9,6 +9,8 @@ steps:
   - pip install -r requirements.txt
   - pylint --rcfile .pylintrc project_amber project_amber/handlers project_amber/helpers project_amber/models
   when:
+    event:
+    - push
     branch:
       exclude:
       - master
@@ -26,8 +28,5 @@ steps:
       - ${DRONE_TAG}
       - latest
   when:
-    branch:
-    - master
     event:
-    - push
     - tag
