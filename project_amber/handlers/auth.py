@@ -4,6 +4,7 @@ from flask import request, Blueprint
 
 from project_amber.const import EMPTY_RESP, MSG_MISSING_AUTH_INFO
 from project_amber.errors import BadRequest
+from project_amber.handlers import login_required, accepts_json
 from project_amber.handlers.const import API_PASSWORD, API_USER, API_TOKEN
 from project_amber.helpers.auth import removeSession, createSession
 from project_amber.logging import log
@@ -12,6 +13,7 @@ auth_handlers = Blueprint("auth_handlers", __name__)
 
 
 @auth_handlers.route("/login", methods=["POST"])
+@accepts_json
 def login():
     """
     Login handler. Accepts this JSON:
@@ -36,9 +38,10 @@ def login():
 
 
 @auth_handlers.route("/logout", methods=["POST"])
+@login_required
 def logout():
     """
-    Logout handler. Accepts empty JSON. Returns HTTP 200 on success.
+    Logout handler. Returns HTTP 200 on success.
     """
     removeSession(request.user.token)
     log("User %s logged out" % request.user.name)

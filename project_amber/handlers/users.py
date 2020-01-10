@@ -3,6 +3,7 @@ from flask import request, Blueprint
 from project_amber.config import config
 from project_amber.const import EMPTY_RESP, MSG_MISSING_AUTH_INFO, MSG_SIGNUP_FORBIDDEN
 from project_amber.errors import BadRequest, Forbidden
+from project_amber.handlers import accepts_json, login_required
 from project_amber.handlers.const import API_PASSWORD, API_USER
 from project_amber.helpers.auth import addUser, updateUser
 
@@ -10,6 +11,8 @@ user_handlers = Blueprint("user_handlers", __name__)
 
 
 @user_handlers.route("/user", methods=["PATCH"])
+@accepts_json
+@login_required
 def user_data():
     """
     User data PATCH request handler. Accepts JSON with these parameters:
@@ -26,6 +29,7 @@ def user_data():
 
 
 @user_handlers.route("/signup", methods=["POST"])
+@accepts_json
 def signup():
     """
     Signup request handler. Accepts this JSON:

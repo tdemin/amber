@@ -7,7 +7,8 @@ from flask import request
 from project_amber.const import MSG_USER_NOT_FOUND, MSG_USER_EXISTS, \
     MSG_MISSING_AUTH_INFO
 from project_amber.db import db
-from project_amber.helpers import time, LoginUser
+from project_amber.helpers import time
+from project_amber.handlers import LoginUser
 from project_amber.errors import Unauthorized, NotFound, Conflict, BadRequest
 from project_amber.logging import log
 from project_amber.models.auth import User, Session

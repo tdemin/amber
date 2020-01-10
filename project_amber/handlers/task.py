@@ -3,6 +3,7 @@ from json import dumps
 from flask import request, Blueprint
 
 from project_amber.const import EMPTY_RESP
+from project_amber.handlers import login_required, accepts_json
 from project_amber.handlers.const import API_QUERY
 from project_amber.helpers.task import addTask, getTask, getTasks, \
     updateTask, removeTask
@@ -11,6 +12,8 @@ task_handlers = Blueprint("task_handlers", __name__)
 
 
 @task_handlers.route("/task", methods=["GET", "POST"])
+@accepts_json
+@login_required
 def task_request():
     """
     Handles requests to `/api/task`. Accepts GET and POST.
@@ -61,6 +64,8 @@ def task_request():
 
 
 @task_handlers.route("/task/<task_id>", methods=["GET", "PATCH", "DELETE"])
+@accepts_json
+@login_required
 def task_id_request(task_id: int):
     """
     Handles requests to `/api/task/<id>`. Accepts GET, PATCH, and DELETE.

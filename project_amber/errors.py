@@ -31,7 +31,7 @@ class BadRequest(HTTPError):
 
 class InternalServerError(HTTPError):
     """
-    Exception class for DB errors. Probably going to be left unused.
+    Exception class for DB-level errors.
     """
     code = HTTPStatus.INTERNAL_SERVER_ERROR
 

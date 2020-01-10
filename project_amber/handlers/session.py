@@ -4,6 +4,7 @@ from flask import request, Blueprint
 
 from project_amber.const import MATURE_SESSION, MSG_IMMATURE_SESSION, EMPTY_RESP
 from project_amber.errors import Forbidden
+from project_amber.handlers import login_required
 from project_amber.handlers.const import API_ID, API_LOGIN_TIME, API_ADDRESS
 from project_amber.helpers import time
 from project_amber.helpers.auth import getSessions, getSession, removeSessionById
@@ -13,6 +14,7 @@ session_handlers = Blueprint("session_handlers", __name__)
 
 
 @session_handlers.route("/session", methods=["GET"])
+@login_required
 def get_sessions():
     """
     Request handler for `/api/session`. Only accepts GET requests. Returns a
@@ -44,6 +46,7 @@ def get_sessions():
 
 
 @session_handlers.route("/session/<session_id>", methods=["GET", "DELETE"])
+@login_required
 def session_by_id(session_id: int):
     """
     Login handler for `/api/session/<id>`. Accepts GET and DELETE
