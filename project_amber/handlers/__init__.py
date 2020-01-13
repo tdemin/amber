@@ -16,11 +16,12 @@ class LoginUser:
     and ID. The corresponding fields are `name` and `id`, respectively.
     Also contains a token field.
     """
-    def __init__(self, name: str, uid: int, token: str, login_time: int):
+    def __init__(self, name: str, uid: int, token: str, login_time: int, remote_addr: str):
         self.name = name
         self.id = uid
         self.token = token
         self.login_time = login_time
+        self.remote_addr = remote_addr
 
 
 def accepts_json(f):
@@ -54,7 +55,7 @@ def login_required(f):
         user = db.session.query(User).filter_by(id=user_s.user).one_or_none()
         if user is None:
             raise InternalServerError(MSG_USER_NOT_FOUND)
-        user_details = LoginUser(user.name, user.id, token, user_s.login_time)
+        user_details = LoginUser(user.name, user.id, token, user_s.login_time, request.remote_addr)
         request.user = user_details
         return f(*args, **kwargs)
 

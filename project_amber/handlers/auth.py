@@ -6,7 +6,7 @@ from project_amber.const import EMPTY_RESP, MSG_MISSING_AUTH_INFO
 from project_amber.errors import BadRequest
 from project_amber.handlers import login_required, accepts_json
 from project_amber.handlers.const import API_PASSWORD, API_USER, API_TOKEN
-from project_amber.helpers.auth import removeSession, createSession
+from project_amber.controllers.auth import UserController
 from project_amber.logging import log
 
 auth_handlers = Blueprint("auth_handlers", __name__)
@@ -31,9 +31,13 @@ def login():
     ```
     Drops HTTP 401 on fail.
     """
-    if not API_USER in request.json or not API_PASSWORD in request.json:
+    username = request.json.get(API_USER)
+    password = request.json.get(API_PASSWORD)
+    if not username or not password:
         raise BadRequest(MSG_MISSING_AUTH_INFO)
-    token = createSession(request.json[API_USER], request.json[API_PASSWORD])
+    uc = UserController(None)
+    token = uc.create_session(username, password, request.remote_addr)
+    log(f"User {username} logged in from {request.remote_addr}")
     return dumps({API_TOKEN: token})
 
 
@@ -43,6 +47,7 @@ def logout():
     """
     Logout handler. Returns HTTP 200 on success.
     """
-    removeSession(request.user.token)
-    log("User %s logged out" % request.user.name)
+    uc = UserController(request.user)
+    uc.remove_session()
+    log(f"User {request.user.name} logged out")
     return EMPTY_RESP

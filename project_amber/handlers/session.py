@@ -5,9 +5,8 @@ from flask import request, Blueprint
 from project_amber.const import MATURE_SESSION, MSG_IMMATURE_SESSION, EMPTY_RESP
 from project_amber.errors import Forbidden
 from project_amber.handlers import login_required
-from project_amber.handlers.const import API_ID, API_LOGIN_TIME, API_ADDRESS
 from project_amber.helpers import time
-from project_amber.helpers.auth import getSessions, getSession, removeSessionById
+from project_amber.controllers.auth import UserController
 from project_amber.logging import log
 
 session_handlers = Blueprint("session_handlers", __name__)
@@ -34,14 +33,11 @@ def get_sessions():
     ]
     ```
     """
-    sessions = getSessions()
-    sessionList = []
+    uc = UserController(request.user)
+    sessions = uc.get_sessions()
+    sessionList = list()
     for session in sessions:
-        sessionList.append({
-            API_ID: session.id,
-            API_LOGIN_TIME: session.login_time,
-            API_ADDRESS: session.address
-        })
+        sessionList.append(session.to_json())
     return dumps(sessionList)
 
 
@@ -63,20 +59,13 @@ def session_by_id(session_id: int):
     case here: if a client session is too recent, this will respond with
     HTTP 403.
     """
+    uc = UserController(request.user)
     if request.method == "GET":
-        session = getSession(session_id)
-        return dumps({
-            API_ID: session.id,
-            API_LOGIN_TIME: session.login_time,
-            API_ADDRESS: session.address
-        })
+        session = uc.get_session(session_id)
+        return dumps(session.to_json())
     if request.method == "DELETE":
-        if (time() - request.user.login_time) < MATURE_SESSION:
+        if (time() - uc.user.login_time) < MATURE_SESSION:
             raise Forbidden(MSG_IMMATURE_SESSION)
-        removeSessionById(session_id)
-        log(
-            "User {0} deleted session {1}".format(
-                request.user.name, session_id
-            )
-        )
+        uc.remove_session_by_id(session_id)
+        log(f"User {uc.user.name} deleted session {session_id}")
     return EMPTY_RESP

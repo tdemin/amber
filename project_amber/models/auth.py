@@ -1,4 +1,5 @@
 from project_amber.db import db
+from project_amber.handlers.const import API_ID, API_LOGIN_TIME, API_ADDRESS
 
 
 class User(db.Model):
@@ -27,3 +28,9 @@ class Session(db.Model):
     def __repr__(self):
         return "<Session token='%s' user='%d' login_time='%d' ip='%s'>" % \
             self.token, self.user, self.login_time, self.address
+
+    def to_json(self) -> dict:
+        """
+        Returns a dictionary containing a JSON representation of the session.
+        """
+        return {API_ID: self.id, API_LOGIN_TIME: self.login_time, API_ADDRESS: self.address}
