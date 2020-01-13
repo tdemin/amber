@@ -7,7 +7,7 @@ steps:
   commands:
   - pip install pylint
   - pip install -r requirements.txt
-  - pylint --rcfile .pylintrc project_amber project_amber/handlers project_amber/helpers project_amber/models
+  - pylint --rcfile .pylintrc project_amber project_amber/handlers project_amber/controllers project_amber/models
   when:
     event:
     - push
