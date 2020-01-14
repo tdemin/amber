@@ -5,7 +5,7 @@ from flask import request
 
 from project_amber.db import db
 from project_amber.const import MSG_NO_TOKEN, MSG_INVALID_TOKEN, MSG_USER_NOT_FOUND, \
-    MSG_USER_EXISTS, MSG_INVALID_JSON, AUTH_TOKEN_HEADER
+    MSG_USER_EXISTS, MSG_INVALID_JSON, AUTH_TOKEN_HEADER, AUTH_TOKEN_SCHEME
 from project_amber.errors import Unauthorized, BadRequest, InternalServerError
 from project_amber.models.auth import User, Session
 
@@ -46,9 +46,15 @@ def login_required(f):
     """
     @wraps(f)
     def decorated_login_function(*args, **kwargs):
-        token = request.headers.get(AUTH_TOKEN_HEADER)
-        if token is None:
+        token_header = request.headers.get(AUTH_TOKEN_HEADER)
+        if token_header is None:
             raise Unauthorized(MSG_NO_TOKEN)
+        token_data = token_header.split(" ")
+        if len(token_data) < 2:
+            raise Unauthorized(MSG_INVALID_TOKEN)
+        if token_data[0] != AUTH_TOKEN_SCHEME:
+            raise Unauthorized(MSG_INVALID_TOKEN)
+        token = token_data[1]
         user_s = db.session.query(Session).filter_by(token=token).one_or_none()
         if user_s is None:
             raise Unauthorized(MSG_INVALID_TOKEN)
