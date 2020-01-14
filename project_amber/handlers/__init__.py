@@ -4,8 +4,8 @@ from re import fullmatch
 from flask import request
 
 from project_amber.db import db
-from project_amber.const import MSG_NO_TOKEN, MSG_INVALID_TOKEN, \
-    MSG_USER_NOT_FOUND, MSG_USER_EXISTS, MSG_INVALID_JSON
+from project_amber.const import MSG_NO_TOKEN, MSG_INVALID_TOKEN, MSG_USER_NOT_FOUND, \
+    MSG_USER_EXISTS, MSG_INVALID_JSON, AUTH_TOKEN_HEADER
 from project_amber.errors import Unauthorized, BadRequest, InternalServerError
 from project_amber.models.auth import User, Session
 
@@ -46,7 +46,7 @@ def login_required(f):
     """
     @wraps(f)
     def decorated_login_function(*args, **kwargs):
-        token = request.headers.get("X-Auth-Token")
+        token = request.headers.get(AUTH_TOKEN_HEADER)
         if token is None:
             raise Unauthorized(MSG_NO_TOKEN)
         user_s = db.session.query(Session).filter_by(token=token).one_or_none()
