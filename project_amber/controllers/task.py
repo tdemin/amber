@@ -78,9 +78,6 @@ class TaskController:
         """
         task = self.get_task(task_id)
         new_details = Task(self.user.id, data)
-        # will drop 404 on a non-existent PID
-        # TODO: a little too hackish
-        self.get_task(new_details.parent_id)
         task.merge(new_details)
         if not new_details.parent_id is None:
             if new_details.parent_id == 0:
