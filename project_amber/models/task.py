@@ -19,10 +19,10 @@ class Task(db.Model):
     text = db.Column(db.String(65536))
     parent_id = db.Column(db.Integer, db.ForeignKey("task.id"))
     status = db.Column(db.Integer, nullable=False)
-    creation_time = db.Column(db.Integer, nullable=False)
-    last_mod_time = db.Column(db.Integer, nullable=False)
-    deadline = db.Column(db.Integer)
-    reminder = db.Column(db.Integer)
+    creation_time = db.Column(db.BigInteger, nullable=False)
+    last_mod_time = db.Column(db.BigInteger, nullable=False)
+    deadline = db.Column(db.BigInteger)
+    reminder = db.Column(db.BigInteger)
     parents = db.Column(db.String(2048), nullable=False)
 
     def isChild(self) -> bool:

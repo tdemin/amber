@@ -3,14 +3,16 @@ from json import dumps
 from flask import request, Blueprint
 
 from project_amber.const import EMPTY_RESP
+from project_amber.handlers import login_required, accepts_json
 from project_amber.handlers.const import API_QUERY
-from project_amber.helpers.task import addTask, getTask, getTasks, \
-    updateTask, removeTask
+from project_amber.controllers.task import TaskController
 
 task_handlers = Blueprint("task_handlers", __name__)
 
 
 @task_handlers.route("/task", methods=["GET", "POST"])
+@accepts_json
+@login_required
 def task_request():
     """
     Handles requests to `/api/task`. Accepts GET and POST.
@@ -46,21 +48,24 @@ def task_request():
     ```
     with a task ID (a literal integer value like `35213`).
     """
+    tc = TaskController(request.user)
     if request.method == "GET":
         query = request.args.get(API_QUERY, None)
         # `query` is OK to be `None`
-        tasks = getTasks(query)
-        tasksList = []
+        tasks = tc.get_tasks(query)
+        tasksList = list()
         for task in tasks:
             tasksList.append(task.toDict())
         return dumps(tasksList)
     if request.method == "POST":
-        new_id = addTask(request.json)
+        new_id = tc.add_task(request.json)
         return dumps(new_id)
     return EMPTY_RESP
 
 
 @task_handlers.route("/task/<task_id>", methods=["GET", "PATCH", "DELETE"])
+@accepts_json
+@login_required
 def task_id_request(task_id: int):
     """
     Handles requests to `/api/task/<id>`. Accepts GET, PATCH, and DELETE.
@@ -89,12 +94,13 @@ def task_id_request(task_id: int):
     }
     ```
     """
+    tc = TaskController(request.user)
     if request.method == "GET":
-        task = getTask(task_id)
+        task = tc.get_task(task_id)
         response = task.toDict()
         return dumps(response)
     if request.method == "PATCH":
-        updateTask(task_id, request.json)
+        tc.update_task(task_id, request.json)
     if request.method == "DELETE":
-        return dumps(removeTask(task_id))
+        return dumps(tc.remove_task(task_id))
     return EMPTY_RESP

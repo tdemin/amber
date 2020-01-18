@@ -13,6 +13,3 @@ bcrypt = "==3.1.7"
 flask-sqlalchemy = "==2.4.1"
 flask-cors = "==3.0.8"
 flask = "==1.1.1"
-
-[requires]
-python_version = "3.7"

@@ -1,12 +1,11 @@
 from json import dumps
 
-from flask import Flask, request
+from flask import Flask
 from flask_cors import CORS
 
 from project_amber.config import config
 from project_amber.db import db
 from project_amber.errors import HTTPError
-from project_amber.helpers import handleLogin, middleware as check_request
 from project_amber.handlers.const import API_V0
 from project_amber.handlers.auth import auth_handlers as auth
 from project_amber.handlers.session import session_handlers as session
@@ -18,13 +17,6 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = config.database
 db.init_app(app)
 CORS(app, resources={r"/*": {"origins": config.domain}})
-
-
-@app.before_request
-def middleware():
-    if check_request().authenticated:
-        request.user = handleLogin()
-
 
 for blueprint in (auth, session, misc, task, user):
     app.register_blueprint(blueprint, url_prefix=API_V0)
