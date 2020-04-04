@@ -1,6 +1,7 @@
 from json import dumps
 
 from flask import Flask
+from flask.wrappers import Response
 from flask_cors import CORS
 
 from project_amber.config import config
@@ -13,8 +14,13 @@ from project_amber.handlers.misc import misc_handlers as misc
 from project_amber.handlers.task import task_handlers as task
 from project_amber.handlers.users import user_handlers as user
 
+class JsonResponse(Response):
+    default_mimetype = "application/json"
+    charset = "utf-8"
+
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = config.database
+app.response_class = JsonResponse
 db.init_app(app)
 CORS(app, resources={r"/*": {"origins": config.domain}})
 
