@@ -3,7 +3,7 @@ name: Python linting
 
 steps:
 - name: pylint
-  image: python:3.7-stretch
+  image: python:3.8-stretch
   commands:
   - pip install pylint
   - pip install -r requirements.txt
