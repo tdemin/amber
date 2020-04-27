@@ -25,14 +25,7 @@ class Task(db.Model):
     reminder = db.Column(db.BigInteger)
     parents = db.Column(db.String(2048), nullable=False)
 
-    def isChild(self) -> bool:
-        """
-        Helper method. Simply checks whether the task is of gen 0 or not.
-        """
-        if self.gen > 0: return True
-        return False
-
-    def toDict(self) -> dict:
+    def to_dict(self) -> dict:
         """
         Helper method that converts public task data (ID, text, PID, status,
         modtime, deadline and reminders) to a dict that can be safely used in
@@ -52,8 +45,6 @@ class Task(db.Model):
     def merge(self, task: "Task"):
         """
         Copies public data from another task.
-
-        Does not update task generations; this has to be done manually.
         """
         for i in ("parent_id", "text", "status", "reminder", "deadline"):
             new_value = getattr(task, i)
@@ -87,7 +78,7 @@ class Task(db.Model):
         """
         db.session.delete(self)
 
-    def getParents(self) -> List[int]:
+    def get_parents(self) -> List[int]:
         """
         Retrieves a list of connected parent IDs that have a higher tree level.
         The list is deserialized from a string contained in the database.
@@ -96,7 +87,7 @@ class Task(db.Model):
             return list()
         return list(map(lambda x: int(x), self.parents.split(SEPARATOR)))
 
-    def setParents(self, pids: List[int]) -> str:
+    def set_parents(self, pids: List[int]) -> str:
         """
         Serializes the provided list of connected parent IDs that have a higher
         tree level into a string. Returns the resulting string.

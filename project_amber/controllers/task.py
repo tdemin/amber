@@ -63,11 +63,11 @@ class TaskController:
         task = self.get_task(task_id)
         if task.parent_id:
             parent = self.get_task(task.parent_id)
-            parent_list = parent.getParents()
+            parent_list = parent.get_parents()
             parent_list.append(parent.id)
-            task.setParents(parent_list)
+            task.set_parents(parent_list)
         else:
-            task.setParents(list())
+            task.set_parents(list())
         children = db.session.query(Task).filter_by(parent_id=task_id).all()
         for child in children:
             self.update_children(child.id)
@@ -86,7 +86,7 @@ class TaskController:
                 self.update_children(task.id)
             else:
                 new_parent = self.get_task(new_details.parent_id)
-                if task.id in new_parent.getParents() or task.id == new_parent.id:
+                if task.id in new_parent.get_parents() or task.id == new_parent.id:
                     raise BadRequest(MSG_TASK_DANGEROUS)
                 task.parent_id = new_parent.id
                 self.update_children(task.id)
