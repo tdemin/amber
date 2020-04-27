@@ -17,7 +17,7 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     owner = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     text = db.Column(db.String(65536))
-    parent_id = db.Column(db.Integer, db.ForeignKey("task.id"))
+    parent_id = db.Column(db.Integer)
     status = db.Column(db.Integer, nullable=False)
     creation_time = db.Column(db.BigInteger, nullable=False)
     last_mod_time = db.Column(db.BigInteger, nullable=False)
@@ -52,15 +52,13 @@ class Task(db.Model):
                 setattr(self, i, new_value)
 
     def __init__(self, owner: int, data: dict = None):
+        # TODO: should't throw HTTP errors from model code
         if not isinstance(data, dict): raise BadRequest
         self.text = data.get(API_TEXT)
         self.status = data.get(API_STATUS)
         self.creation_time = time()
         self.last_mod_time = self.creation_time
         self.parent_id = data.get(API_PID)
-        # SQLite is fine with 0 in foreign key, Postgres isn't,
-        # and this needs a workaround
-        if self.parent_id == 0: self.parent_id = None
         self.deadline = data.get(API_DEADLINE)
         self.reminder = data.get(API_REMINDER)
         self.parents = ""
