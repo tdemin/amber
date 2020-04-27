@@ -53,6 +53,8 @@ class Task(db.Model):
 
     def __init__(self, owner: int, data: dict = None):
         # TODO: should't throw HTTP errors from model code
+        # TODO: ideally this dictionary should be a TypedDict; we've bumped our
+        # Python requirements to 3.8 already
         if not isinstance(data, dict): raise BadRequest
         self.text = data.get(API_TEXT)
         self.status = data.get(API_STATUS)

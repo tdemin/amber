@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional, cast
 
 from project_amber.const import MSG_TASK_NOT_FOUND, MSG_TASK_DANGEROUS, \
     MSG_TEXT_NOT_SPECIFIED
@@ -10,7 +10,7 @@ from project_amber.models.task import Task
 
 
 class TaskController:
-    user: LoginUser = None
+    user: LoginUser
 
     def __init__(self, user: LoginUser):
         self.user = user
