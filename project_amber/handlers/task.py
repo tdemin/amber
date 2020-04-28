@@ -55,7 +55,7 @@ def task_request():
         tasks = tc.get_tasks(query)
         tasksList = list()
         for task in tasks:
-            tasksList.append(task.toDict())
+            tasksList.append(task.to_dict())
         return dumps(tasksList)
     if request.method == "POST":
         new_id = tc.add_task(request.json)
@@ -97,7 +97,7 @@ def task_id_request(task_id: int):
     tc = TaskController(request.user)
     if request.method == "GET":
         task = tc.get_task(task_id)
-        response = task.toDict()
+        response = task.to_dict()
         return dumps(response)
     if request.method == "PATCH":
         tc.update_task(task_id, request.json)

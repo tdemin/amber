@@ -34,8 +34,8 @@ except OSError as ioerr:
     print(ioerr.strerror)
     sys.exit(1)
 
-for entry in vars(config):
-    if entry in loadedConfig:
+for entry in dir(config):
+    if entry in loadedConfig and not entry.startswith("__"):
         setattr(config, entry, loadedConfig[entry])
 
 

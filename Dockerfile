@@ -1,4 +1,4 @@
-FROM python:3.7-alpine
+FROM python:3.8-alpine
 LABEL maintainer "Timur Demin <me@tdem.in>"
 WORKDIR /app
 ENV UWSGI_PORT 8080

@@ -37,7 +37,7 @@ def gen_token() -> str:
 
 
 class UserController:
-    user: LoginUser = None
+    user: LoginUser
 
     def __init__(self, user: LoginUser):
         self.user = user
