@@ -23,4 +23,4 @@ MSG_TASK_NOT_FOUND = "This task does not exist"
 MSG_TEXT_NOT_SPECIFIED = "No text specified"
 MSG_TASK_DANGEROUS = "Potentially dangerous operation"
 
-VERSION = "0.0.4"
+VERSION = "0.0.5"
